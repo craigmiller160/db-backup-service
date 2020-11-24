@@ -1,0 +1,10 @@
+{
+  "databases": [
+    {
+      "name": "vm_dev",
+      "schemas": [
+        "public"
+      ]
+    }
+  ]
+}
