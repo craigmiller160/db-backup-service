@@ -19,6 +19,7 @@ public class Application {
     }
 
     public void start() {
+        log.info("Starting application");
         propReader.readProperties()
                 .map(propStore ->
                         configReader.readBackupConfig()
