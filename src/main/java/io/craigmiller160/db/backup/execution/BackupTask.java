@@ -12,6 +12,13 @@ import java.util.stream.Collectors;
 
 public class BackupTask implements Runnable {
 
+    private static final String PG_DUMP_CMD = "pg_dump";
+    private static final String HOST_ARG = "-h";
+    private static final String SCHEMA_ARG = "-n";
+    private static final String PORT_ARG = "-p";
+    private static final String USER_ARG = "-U";
+    private static final String USE_INSERT_STATEMENTS = "--column-inserts";
+
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
 
     private final PropertyStore propStore;
@@ -40,16 +47,17 @@ public class BackupTask implements Runnable {
         log.info("Running backup for Database {} and Schema {}", database, schema);
 
         final var command = new String[] {
-                "pg_dump",
+                PG_DUMP_CMD,
                 database,
-                "-n",
+                SCHEMA_ARG,
                 schema,
-                "-h",
+                HOST_ARG,
                 propStore.getPostgresHost(),
-                "-p",
+                PORT_ARG,
                 propStore.getPostgresPort(),
-                "-U",
-                propStore.getPostgresUser()
+                USER_ARG,
+                propStore.getPostgresUser(),
+                USE_INSERT_STATEMENTS
         };
         final var environment = Map.of("PGPASSWORD", propStore.getPostgresPassword());
         Try.of(() -> processProvider.provide(command, environment))
