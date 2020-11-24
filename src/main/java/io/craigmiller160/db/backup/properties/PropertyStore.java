@@ -12,6 +12,7 @@ public class PropertyStore {
     private static final String DB_POSTGRES_PASSWORD = "db.postgres.password";
     private static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
     private static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
+    private static final String OUTPUT_ROOT_DIR = "output.root-directory";
 
     private final Properties props;
 
@@ -41,6 +42,10 @@ public class PropertyStore {
 
     public int getExecutorIntervalSecs() {
         return Integer.parseInt(props.getProperty(EXECUTOR_INTERVAL_SECS));
+    }
+
+    public String getOutputRootDirectory() {
+        return props.getProperty(OUTPUT_ROOT_DIR);
     }
 
 }
