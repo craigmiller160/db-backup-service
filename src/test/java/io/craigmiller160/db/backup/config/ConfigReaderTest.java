@@ -22,7 +22,7 @@ public class ConfigReaderTest {
                         )
                 )
         );
-        final var actual = configReader.readBackupConfig();
+        final var actual = configReader.readBackupConfig().get();
         assertEquals(expected, actual);
     }
 
