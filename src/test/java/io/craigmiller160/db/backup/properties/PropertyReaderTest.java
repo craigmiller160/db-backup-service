@@ -10,7 +10,7 @@ public class PropertyReaderTest {
 
     @Test
     public void test_readProperties() throws Exception {
-        final var propStore = propertyReader.readProperties();
+        final var propStore = propertyReader.readProperties().get();
         assertEquals("localhost", propStore.getPostgresHost());
         assertEquals("30001", propStore.getPostgresPort());
         assertEquals("user", propStore.getPostgresUser());
