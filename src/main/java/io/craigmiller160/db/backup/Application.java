@@ -4,6 +4,7 @@ import io.craigmiller160.db.backup.config.ConfigReader;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
 import io.craigmiller160.db.backup.properties.PropertyReader;
 import io.vavr.Tuple;
+import io.vavr.control.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ public class Application {
                 )
                 .flatMap(tupleTry -> tupleTry)
                 .onSuccess(tuple -> {
+                    log.info("Setting up scheduler");
                     synchronized (BACKUP_SCHEDULER_LOG) {
                         backupScheduler = new BackupScheduler(tuple._1, tuple._2);
                     }
@@ -37,8 +39,13 @@ public class Application {
                 .onFailure(ex -> log.error("Error starting application", ex));
     }
 
+    // TODO how to trigger this when application is shutting down?
     public void stop() {
-        // TODO probably need some kind of graceful shutdown here
+        log.info("Stopping scheduler");
+        synchronized (BACKUP_SCHEDULER_LOG) {
+            Option.of(backupScheduler)
+                    .forEach(BackupScheduler::shutdown);
+        }
     }
 
 }

@@ -18,4 +18,8 @@ public class BackupScheduler {
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
     }
 
+    public void shutdown() {
+        this.executor.shutdown();
+    }
+
 }
