@@ -28,6 +28,7 @@ public class BackupTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final String TIME_ZONE = "US/Eastern";
 
     private final PropertyStore propStore;
     private final String database;
@@ -71,7 +72,7 @@ public class BackupTask implements Runnable {
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readOutput)
                 .flatMap(this::writeToFile)
-                .onSuccess(filePath -> log.info("Successfully write backup for Database {} and Schema {} to File {}", database, schema, filePath))
+                .onSuccess(filePath -> log.info("Successfully wrote backup for Database {} and Schema {} to File {}", database, schema, filePath))
                 .onFailure(ex -> log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex));
     }
 
@@ -88,7 +89,7 @@ public class BackupTask implements Runnable {
             return Try.failure(new BackupException(String.format("Unable to create output directory: %s", dbOutputDir.getAbsolutePath())));
         }
 
-        final var timestamp = ZonedDateTime.now(ZoneId.of("EST"));
+        final var timestamp = FORMAT.format(ZonedDateTime.now(ZoneId.of(TIME_ZONE)));
         final var outputFile = new File(dbOutputDir, String.format("backup_%s.sql", timestamp));
 
         return Try.withResources(() -> new FileWriter(outputFile))
