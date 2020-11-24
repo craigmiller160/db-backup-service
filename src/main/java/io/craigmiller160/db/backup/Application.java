@@ -34,6 +34,7 @@ public class Application {
                     log.info("Setting up scheduler");
                     synchronized (BACKUP_SCHEDULER_LOG) {
                         backupScheduler = new BackupScheduler(tuple._1, tuple._2);
+                        backupScheduler.start();
                     }
                 })
                 .onFailure(ex -> log.error("Error starting application", ex));
@@ -44,7 +45,7 @@ public class Application {
         log.info("Stopping scheduler");
         synchronized (BACKUP_SCHEDULER_LOG) {
             Option.of(backupScheduler)
-                    .forEach(BackupScheduler::shutdown);
+                    .forEach(BackupScheduler::stop);
         }
     }
 
