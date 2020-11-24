@@ -11,11 +11,22 @@ public class BackupTask implements Runnable {
     private final PropertyStore propStore;
     private final String database;
     private final String schema;
+    private final ProcessProvider processProvider;
 
-    public BackupTask(final PropertyStore propStore, final String database, final String schema) {
+    public BackupTask(final PropertyStore propStore,
+                      final String database,
+                      final String schema,
+                      final ProcessProvider processProvider) {
         this.propStore = propStore;
         this.database = database;
         this.schema = schema;
+        this.processProvider = processProvider;
+    }
+
+    public BackupTask(final PropertyStore propStore,
+                      final String database,
+                      final String schema) {
+        this (propStore, database, schema, ProcessProvider.DEFAULT);
     }
 
     @Override
