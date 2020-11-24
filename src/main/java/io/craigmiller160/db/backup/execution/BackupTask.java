@@ -1,10 +1,14 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class BackupTask implements Runnable {
 
@@ -48,7 +52,16 @@ public class BackupTask implements Runnable {
                 propStore.getPostgresUser()
         };
         final var environment = Map.of("PGPASSWORD", propStore.getPostgresPassword());
-        final var process = processProvider.provide(command, environment);
+        Try.of(() -> processProvider.provide(command, environment))
+                .flatMap(this::readOutput)
+                // TODO make these better
+                .onSuccess(System.out::println)
+                .onFailure(Throwable::printStackTrace);
+    }
+
+    private Try<String> readOutput(final Process process) {
+        return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getInputStream())))
+                .of(reader -> reader.lines().collect(Collectors.joining("\n")));
     }
 
 }
