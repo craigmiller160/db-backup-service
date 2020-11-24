@@ -1,12 +1,19 @@
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,6 +27,7 @@ public class BackupTask implements Runnable {
     private static final String USE_INSERT_STATEMENTS = "--column-inserts";
 
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
+    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private final PropertyStore propStore;
     private final String database;
@@ -73,8 +81,25 @@ public class BackupTask implements Runnable {
     }
 
     private Try<String> writeToFile(final String dbBackupText) {
-        // TODO finish this, return file path
-        return null;
+        final var outputRootDir = new File(propStore.getOutputRootDirectory());
+        final var dbOutputDir = new File(outputRootDir, database);
+
+        if (!dbOutputDir.exists() && !dbOutputDir.mkdirs()) {
+            return Try.failure(new BackupException(String.format("Unable to create output directory: %s", dbOutputDir.getAbsolutePath())));
+        }
+
+        final var timestamp = ZonedDateTime.now(ZoneId.of("EST"));
+        final var outputFile = new File(dbOutputDir, String.format("backup_%s.sql", timestamp));
+
+        return Try.withResources(() -> new FileWriter(outputFile))
+                .of(writer -> {
+                    writer.write(dbBackupText);
+                    return writer;
+                })
+                .map(writer -> outputFile.getAbsolutePath())
+                .recoverWith(ex -> Try.failure(
+                        new BackupException(String.format("Error writing backup data for Database %s and Schema %s to File %s", database, schema, outputFile.getAbsolutePath()), ex)
+                ));
     }
 
 }
