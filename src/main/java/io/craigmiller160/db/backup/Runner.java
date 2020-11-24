@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 public class Runner {
 
     public static void main(final String[] args) {
-        final Logger log = LoggerFactory.getLogger("io.craigmiller160.Runner");
+        final Logger log = LoggerFactory.getLogger(Runner.class);
         log.info("Hello World");
 
         try {
