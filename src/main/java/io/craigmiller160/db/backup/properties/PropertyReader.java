@@ -9,7 +9,7 @@ public class PropertyReader {
 
     private static final String PROPERTIES_PATH = "application.properties";
 
-    public Try<PropertyStore> readProperties() throws PropertyException {
+    public Try<PropertyStore> readProperties() {
         return Try.withResources(() -> PropertyReader.class.getClassLoader().getResourceAsStream(PROPERTIES_PATH))
                 .of(propStream -> {
                     final Properties props = new Properties();
