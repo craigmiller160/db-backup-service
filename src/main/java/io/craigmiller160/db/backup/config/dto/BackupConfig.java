@@ -1,4 +1,4 @@
-package io.craigmiller160.db.backup.config;
+package io.craigmiller160.db.backup.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
