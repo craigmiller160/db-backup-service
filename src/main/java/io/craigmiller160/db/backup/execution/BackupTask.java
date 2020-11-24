@@ -62,9 +62,9 @@ public class BackupTask implements Runnable {
         final var environment = Map.of("PGPASSWORD", propStore.getPostgresPassword());
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readOutput)
-                // TODO make these better
+                // TODO success means writing out the file
                 .onSuccess(System.out::println)
-                .onFailure(Throwable::printStackTrace);
+                .onFailure(ex -> log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex));
     }
 
     private Try<String> readOutput(final Process process) {
