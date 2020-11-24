@@ -14,8 +14,13 @@ public class PropertyReader {
                 .of(propStream -> {
                     final Properties props = new Properties();
                     props.load(propStream);
-                    return new PropertyStore(props);
+                    return props;
                 })
+                .map(props -> {
+                    System.getenv().forEach(props::setProperty);
+                    return props;
+                })
+                .map(PropertyStore::new)
                 .recoverWith(ex -> Try.failure(new PropertyException("Error reading properties file", ex)));
     }
 

@@ -15,6 +15,7 @@
         <slf4j.version>1.7.30</slf4j.version>
         <log4j.version>2.14.0</log4j.version>
         <vavr.version>0.10.3</vavr.version>
+        <junit.pioneer.version>1.0.0</junit.pioneer.version>
     </properties>
 
     <dependencies>
@@ -48,6 +49,12 @@
             <groupId>io.vavr</groupId>
             <artifactId>vavr</artifactId>
             <version>${vavr.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit-pioneer</groupId>
+            <artifactId>junit-pioneer</artifactId>
+            <version>${junit.pioneer.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
