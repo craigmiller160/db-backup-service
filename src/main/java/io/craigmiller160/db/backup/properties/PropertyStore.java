@@ -10,6 +10,8 @@ public class PropertyStore {
     private static final String DB_POSTGRES_PORT = "db.postgres.port";
     private static final String DB_POSTGRES_USER = "db.postgres.user";
     private static final String DB_POSTGRES_PASSWORD = "db.postgres.password";
+    private static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
+    private static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
 
     private final Properties props;
 
@@ -17,28 +19,28 @@ public class PropertyStore {
         this.props = props;
     }
 
-    private String getRequiredProperty(final String key) throws PropertyException {
-        final String value = props.getProperty(key);
-        if (value == null || value.trim().isEmpty()) {
-            throw new PropertyException(String.format("Required property is missing: %s", key));
-        }
-        return value;
+    public String getPostgresHost() {
+        return props.getProperty(DB_POSTGRES_HOST);
     }
 
-    public String getPostgresHost() throws PropertyException {
-        return getRequiredProperty(DB_POSTGRES_HOST);
+    public String getPostgresPort() {
+        return props.getProperty(DB_POSTGRES_PORT);
     }
 
-    public String getPostgresPort() throws PropertyException {
-        return getRequiredProperty(DB_POSTGRES_PORT);
+    public String getPostgresUser() {
+        return props.getProperty(DB_POSTGRES_USER);
     }
 
-    public String getPostgresUser() throws PropertyException {
-        return getRequiredProperty(DB_POSTGRES_USER);
+    public String getPostgresPassword() {
+        return props.getProperty(DB_POSTGRES_PASSWORD);
     }
 
-    public String getPostgresPassword() throws PropertyException {
-        return getRequiredProperty(DB_POSTGRES_PASSWORD);
+    public int getExecutorThreadCount() {
+        return Integer.parseInt(props.getProperty(EXECUTOR_THREAD_COUNT));
+    }
+
+    public int getExecutorIntervalSecs() {
+        return Integer.parseInt(props.getProperty(EXECUTOR_INTERVAL_SECS));
     }
 
 }
