@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -30,21 +31,47 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 public class BackupSchedulerTest {
+
+    private static final String DB_NAME = "DbName";
+    private static final String DB_NAME_2 = "DbName2";
+    private static final String SCHEMA_1 = "schema1";
+    private static final String SCHEMA_2 = "schema2";
+    private static final String SCHEMA_3 = "schema3";
 
     private PropertyStore propStore;
     private BackupConfig backupConfig;
     private TestBackupTaskFactory backupTaskFactory;
+    private BackupScheduler backupScheduler;
 
     @BeforeEach
     public void setup() {
         final var properties = new Properties();
+        properties.setProperty("executor.thread-count", "4");
+        properties.setProperty("executor.interval-secs", "3000");
         propStore = new PropertyStore(properties);
+        backupConfig = new BackupConfig(List.of(
+                new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
+                new DatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
+        ));
+        backupTaskFactory = new TestBackupTaskFactory();
+        backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory);
     }
 
     @Test
-    public void test_start() {
-        throw new RuntimeException();
+    public void test_start() throws Exception {
+        backupScheduler.start();
+        Thread.sleep(1000);
+        assertTrue(backupScheduler.stop());
+        final var taskProps = backupTaskFactory.getTaskProps();
+        assertEquals(3, taskProps.size());
+        taskProps.sort((t1, t2) -> t1._2.compareTo(t2._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), taskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), taskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), taskProps.get(2));
     }
 
     private static class TestBackupTaskFactory extends BackupTaskFactory {
@@ -52,6 +79,7 @@ public class BackupSchedulerTest {
 
         @Override
         public Runnable createBackupTask(PropertyStore propStore, String database, String schema) {
+            System.out.println("Creating task: " + database + " " + schema); // TODO delete this
             return () -> {
                 taskProps.add(Tuple.of(database, schema));
             };

@@ -21,6 +21,7 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +59,16 @@ public class BackupScheduler {
                 .forEach(task -> executor.scheduleAtFixedRate(task, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS));
     }
 
-    public void stop() {
-        this.executor.shutdown();
+    public boolean stop() {
+        return Try.of(() -> {
+            this.executor.shutdown();
+            return this.executor.awaitTermination(60000, TimeUnit.SECONDS);
+        })
+                .recoverWith(ex -> {
+                    log.error("Error shutting down executor", ex);
+                    return Try.success(false);
+                })
+                .get();
     }
 
 }
