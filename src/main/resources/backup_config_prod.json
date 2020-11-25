@@ -1,0 +1,23 @@
+{
+  "databases": [
+    {
+      "name": "vm_dev",
+      "schemas": [
+        "public"
+      ]
+    },
+    {
+      "name": "vm_prod",
+      "schemas": [
+        "public"
+      ]
+    },
+    {
+      "name": "oauth2_server",
+      "schemas": [
+        "dev",
+        "prod"
+      ]
+    }
+  ]
+}
