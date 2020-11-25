@@ -20,7 +20,9 @@ Use IntelliJ to run the `Runner.java` file.
 
 ## Deploying to Production
 
-First, fully build the application with `mvn clean package`. Then, run the `deploy.sh` script to deploy it to Kubernetes in production.
+First, double check the `deploy/deployment.yml` volume information. This should point to a path that represents an external hard drive. That way the data is being backed up in a place separate from the main OS drive, so that can be wiped safely without risking data loss.
+
+Now, fully build the application with `mvn clean package`. Then, run the `deploy.sh` script to deploy it to Kubernetes in production.
 
 ## Adding Databases/Schemas to Backup
 
