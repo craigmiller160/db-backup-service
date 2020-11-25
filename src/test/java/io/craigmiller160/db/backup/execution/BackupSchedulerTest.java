@@ -70,6 +70,7 @@ public class BackupSchedulerTest {
 
     @Test
     public void test_start() throws Exception {
+        final var startTimestamp = System.currentTimeMillis();
         backupScheduler.start();
         Thread.sleep(1000);
         assertTrue(backupScheduler.stop());
@@ -79,6 +80,7 @@ public class BackupSchedulerTest {
         assertEquals(Tuple.of(DB_NAME, SCHEMA_1), taskProps.get(0));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_2), taskProps.get(1));
         assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), taskProps.get(2));
+        assertTrue(startTimestamp < backupScheduler.getLivenessTimestamp());
     }
 
     private static class TestTaskFactory extends TaskFactory {

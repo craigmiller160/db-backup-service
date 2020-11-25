@@ -47,14 +47,18 @@ public class BackupScheduler {
         this.backupConfig = backupConfig;
         this.taskFactory = taskFactory;
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
-        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(this::updateLivenessTimestamp), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
     }
 
     private void updateLivenessTimestamp(long timestamp) {
         livenessTimestamp.set(timestamp);
     }
 
+    public long getLivenessTimestamp() {
+        return livenessTimestamp.get();
+    }
+
     public void start() {
+        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(this::updateLivenessTimestamp), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
         backupConfig.databases()
                 .stream()
                 .flatMap(db ->
