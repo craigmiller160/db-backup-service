@@ -20,7 +20,7 @@ Use IntelliJ to run the `Runner.java` file.
 
 ## Deploying to Production
 
-First, double check the `deploy/deployment.yml` volume information. This should point to a path that represents an external hard drive. That way the data is being backed up in a place separate from the main OS drive, so that can be wiped safely without risking data loss.
+First, an output directory needs to be configured on the local filesystem. The Kubernetes volume will point to `/opt/kubernetes/data/db-backup-service`, however that path should be symlinked so that it points to an external hard drive. That way the data is written to a place that will not be affected if the hard drive with the OS needs to be wiped/reinstalled.
 
 Now, fully build the application with `mvn clean package`. Then, run the `deploy.sh` script to deploy it to Kubernetes in production.
 
