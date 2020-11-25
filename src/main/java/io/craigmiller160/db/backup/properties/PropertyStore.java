@@ -18,6 +18,14 @@
 
 package io.craigmiller160.db.backup.properties;
 
+import io.craigmiller160.db.backup.exception.PropertyException;
+import io.vavr.Tuple;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 public class PropertyStore {
@@ -31,12 +39,36 @@ public class PropertyStore {
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
 
-    // TODO add validation to the properties when they are first read
+    private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
+            HashMap.of(
+                    DB_POSTGRES_HOST, PropertyValidator.IS_NOT_BLANK,
+                    DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC,
+                    DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK,
+                    DB_POSTGRES_PASSWORD, PropertyValidator.IS_NOT_BLANK,
+                    EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC,
+                    EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC,
+                    OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK,
+                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK
+            );
 
     private final Properties props;
 
     public PropertyStore(final Properties props) {
         this.props = props;
+    }
+
+    public Try<?> validateProperties() {
+        return PROPERTY_VALIDATION_MAP
+                .find(entry -> !entry._2.validate(props.getProperty(entry._1)))
+                .toTry()
+                .flatMap(entry -> Try.failure(new PropertyException(String.format("Invalid property value: %s", entry._1))))
+                .recoverWith(ex -> {
+                    if (ex instanceof NoSuchElementException) {
+                        return Try.success("Found element");
+                    } else {
+                        return Try.failure(ex);
+                    }
+                });
     }
 
     public String getPostgresHost() {
