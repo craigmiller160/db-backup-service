@@ -20,15 +20,21 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class BackupSchedulerTest {
 
     private PropertyStore propStore;
     private BackupConfig backupConfig;
+    private TestBackupTaskFactory backupTaskFactory;
 
     @BeforeEach
     public void setup() {
@@ -37,8 +43,23 @@ public class BackupSchedulerTest {
     }
 
     @Test
-    public void test() {
+    public void test_start() {
         throw new RuntimeException();
+    }
+
+    private static class TestBackupTaskFactory extends BackupTaskFactory {
+        private final List<Tuple2<String,String>> taskProps = Collections.synchronizedList(new ArrayList<>());
+
+        @Override
+        public Runnable createBackupTask(PropertyStore propStore, String database, String schema) {
+            return () -> {
+                taskProps.add(Tuple.of(database, schema));
+            };
+        }
+
+        public List<Tuple2<String,String>> getTaskProps() {
+            return new ArrayList<>(taskProps);
+        }
     }
 
 }
