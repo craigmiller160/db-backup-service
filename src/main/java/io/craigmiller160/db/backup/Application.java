@@ -13,20 +13,13 @@ public class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
     private static final Object BACKUP_SCHEDULER_LOG = new Object();
 
-    private final PropertyReader propReader;
-    private final ConfigReader configReader;
     private BackupScheduler backupScheduler;
-
-    public Application() {
-        this.propReader = new PropertyReader();
-        this.configReader = new ConfigReader();
-    }
 
     public void start() {
         log.info("Starting application");
-        propReader.readProperties()
+        new PropertyReader().readProperties()
                 .map(propStore ->
-                        configReader.readBackupConfig()
+                        new ConfigReader(propStore).readBackupConfig()
                                 .map(config -> Tuple.of(propStore, config))
                 )
                 .flatMap(tupleTry -> tupleTry)

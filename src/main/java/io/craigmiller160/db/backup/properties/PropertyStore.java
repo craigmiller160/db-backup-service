@@ -13,6 +13,7 @@ public class PropertyStore {
     private static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
     private static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     private static final String OUTPUT_ROOT_DIR = "output.root-directory";
+    private static final String CONFIG_FILE = "config.file";
 
     private final Properties props;
 
@@ -46,6 +47,10 @@ public class PropertyStore {
 
     public String getOutputRootDirectory() {
         return props.getProperty(OUTPUT_ROOT_DIR);
+    }
+
+    public String getConfigFile() {
+        return props.getProperty(CONFIG_FILE);
     }
 
 }
