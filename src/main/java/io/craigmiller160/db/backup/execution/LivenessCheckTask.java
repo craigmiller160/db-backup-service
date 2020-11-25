@@ -19,9 +19,12 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
@@ -56,7 +59,7 @@ public class LivenessCheckTask implements Runnable {
 
     @Override
     public void run() {
-        log.info("Updating liveness check script");
+        log.debug("Updating liveness check script");
 
         final var maxTimestamp = ZonedDateTime.now(ZoneId.of("UTC"))
                 .plusSeconds(propStore.getExecutorIntervalSecs() * 2)
@@ -64,7 +67,16 @@ public class LivenessCheckTask implements Runnable {
                 .toEpochMilli();
 
         final var script = LIVENESS_SCRIPT_TEMPLATE.formatted(maxTimestamp);
-        System.out.println(script); // TODO delete this
+        final var outputDir = new File(propStore.getOutputRootDirectory());
+        final var livenessFile = new File(outputDir, LIVENESS_SCRIPT_FILE);
+
+        Try.withResources(() -> new FileWriter(livenessFile))
+                .of(writer -> {
+                    writer.write(script);
+                    return writer;
+                })
+                .onSuccess(writer -> log.info("Successfully updated liveness check script"))
+                .onFailure(ex -> log.error("Error updating liveness check script", ex));
     }
 
 }
