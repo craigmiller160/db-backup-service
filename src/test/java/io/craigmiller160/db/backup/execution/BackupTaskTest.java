@@ -21,9 +21,13 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Properties;
 
+@ExtendWith(MockitoExtension.class)
 public class BackupTaskTest {
 
     private static final String DB_NAME = "DbName";
@@ -31,6 +35,8 @@ public class BackupTaskTest {
 
     private PropertyStore propStore;
     private BackupTask backupTask;
+    @Mock
+    private Process process;
 
     @BeforeEach
     public void setup() {
