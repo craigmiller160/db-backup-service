@@ -18,9 +18,23 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Properties;
+
 public class BackupSchedulerTest {
+
+    private PropertyStore propStore;
+    private BackupConfig backupConfig;
+
+    @BeforeEach
+    public void setup() {
+        final var properties = new Properties();
+        propStore = new PropertyStore(properties);
+    }
 
     @Test
     public void test() {
