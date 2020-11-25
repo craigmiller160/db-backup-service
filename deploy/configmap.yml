@@ -10,5 +10,4 @@ data:
   config.file: backup_config_prod.json
   # TODO work on the output dir so it writes to external source
   output.root-directory: /output
-  # TODO delete this
-  executor.interval-secs: "30"
+  executor.interval-secs: "3600"
