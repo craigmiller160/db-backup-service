@@ -32,6 +32,10 @@ public class BackupTaskTest {
 
     private static final String DB_NAME = "DbName";
     private static final String SCHEMA_NAME = "SchemaName";
+    private static final String HOST = "host";
+    private static final String PORT = "100";
+    private static final String USER = "user";
+    private static final String PASSWORD = "password";
 
     private PropertyStore propStore;
     private BackupTask backupTask;
@@ -41,11 +45,17 @@ public class BackupTaskTest {
     @BeforeEach
     public void setup() {
         final var props = new Properties();
+        props.setProperty(PropertyStore.DB_POSTGRES_HOST, HOST);
+        props.setProperty(PropertyStore.DB_POSTGRES_PORT, PORT);
+        props.setProperty(PropertyStore.DB_POSTGRES_USER, USER);
+        props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, PASSWORD);
         propStore = new PropertyStore(props);
+        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME);
     }
 
     @Test
     public void test_run() {
+        backupTask.run();
         throw new RuntimeException();
     }
 
