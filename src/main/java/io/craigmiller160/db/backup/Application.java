@@ -22,7 +22,6 @@ import io.craigmiller160.db.backup.config.ConfigReader;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
 import io.craigmiller160.db.backup.execution.TaskFactory;
 import io.craigmiller160.db.backup.properties.PropertyReader;
-import io.craigmiller160.db.backup.server.JettyServer;
 import io.vavr.Tuple;
 import io.vavr.control.Option;
 import org.slf4j.Logger;
@@ -35,7 +34,6 @@ public class Application {
 
     private final TaskFactory taskFactory = new TaskFactory();
     private BackupScheduler backupScheduler;
-    private JettyServer jettyServer;
 
     public void start() {
         log.info("Starting application");
@@ -45,8 +43,6 @@ public class Application {
                                 .map(config -> Tuple.of(propStore, config))
                 )
                 .onSuccess(tuple -> {
-                    jettyServer = new JettyServer(tuple._1);
-                    jettyServer.start(); // TODO figure out a better way to do this
 
                     log.info("Setting up scheduler");
                     synchronized (LOCK) {
@@ -61,8 +57,6 @@ public class Application {
     public void stop() {
         log.info("Stopping scheduler");
         synchronized (LOCK) {
-            Option.of(jettyServer)
-                    .forEach(JettyServer::stop);
             Option.of(backupScheduler)
                     .forEach(BackupScheduler::stop);
         }
