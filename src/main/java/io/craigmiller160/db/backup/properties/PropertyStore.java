@@ -55,7 +55,8 @@ public class PropertyStore {
         this.props = props;
     }
 
-    public Try<Void> validateProperties() {
+    public Try<String> validateProperties() {
+        // TODO so this fails because if nothing is found, it's still a Try.failure()
         return PROPERTY_VALIDATION_MAP
                 .find(entry -> !entry._2.validate(props.getProperty(entry._1)))
                 .toTry()

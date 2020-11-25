@@ -18,13 +18,41 @@
 
 package io.craigmiller160.db.backup.properties;
 
+import io.vavr.control.Try;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertyStoreTest {
 
+    private Properties props;
+
+    @BeforeEach
+    public void setup() {
+        props = new Properties();
+        props.setProperty(PropertyStore.DB_POSTGRES_HOST, "host");
+        props.setProperty(PropertyStore.DB_POSTGRES_PORT, "100");
+        props.setProperty(PropertyStore.DB_POSTGRES_USER, "user");
+        props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, "password");
+        props.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
+        props.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "1000");
+        props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, System.getProperty("user.dir"));
+        props.setProperty(PropertyStore.CONFIG_FILE, "backup_config.json");
+    }
+
     @Test
     public void test_allValid() {
-        throw new RuntimeException();
+        final var propStore = new PropertyStore(props);
+        final var result = propStore.validateProperties()
+                .recoverWith(ex -> {
+                    ex.printStackTrace();
+                    return Try.failure(ex);
+                })
+                .isSuccess();
+        assertTrue(result);
     }
 
     @Test
