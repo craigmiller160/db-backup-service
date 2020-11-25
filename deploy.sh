@@ -18,14 +18,12 @@
 #     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 
-raw_name=$(cat pom.xml | grep artifactId | head -n2 | tail -n1)
+raw_name=$(cat pom.xml | grep artifactId | head -n1 | tail -n1)
 name=$(echo $raw_name | sed 's/^\s*<artifactId>//g' | sed 's/<\/artifactId>$//g')
 raw_version=$(cat pom.xml | grep version | head -n2 | tail -n1)
 version=$(echo $raw_version | sed 's/^\s*<version>//g' | sed 's/<\/version>$//g')
 registry=localhost:32000
 tag=$registry/$name:$version
-
-echo $name # TODO delete this
 
 check_artifact_version() {
   artifact_version=$(ls deploy/build | grep jar | sed 's/\.jar$//g' | sed "s/^$name-//g")
