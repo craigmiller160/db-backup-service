@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
@@ -39,7 +40,7 @@ public class BackupTaskTest {
     private static final String PORT = "100";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
-    private static final String OUTPUT_ROOT = "";
+    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target");
 
     private PropertyStore propStore;
     private BackupTask backupTask;
@@ -68,6 +69,7 @@ public class BackupTaskTest {
 
     @Test
     public void test_run_cantFindData() {
+        // TODO not even sure how to write a test for this...
         throw new RuntimeException();
     }
 
