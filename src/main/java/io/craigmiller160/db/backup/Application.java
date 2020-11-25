@@ -38,11 +38,10 @@ public class Application {
     public void start() {
         log.info("Starting application");
         new PropertyReader().readProperties()
-                .map(propStore ->
+                .flatMap(propStore ->
                         new ConfigReader(propStore).readBackupConfig()
                                 .map(config -> Tuple.of(propStore, config))
                 )
-                .flatMap(tupleTry -> tupleTry)
                 .onSuccess(tuple -> {
                     log.info("Setting up scheduler");
                     synchronized (BACKUP_SCHEDULER_LOG) {
