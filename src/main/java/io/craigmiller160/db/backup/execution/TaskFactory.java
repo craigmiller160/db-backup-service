@@ -20,7 +20,7 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 
-public class BackupTaskFactory {
+public class TaskFactory {
 
     public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
         return new BackupTask(propStore, database, schema);

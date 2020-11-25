@@ -36,14 +36,14 @@ public class BackupScheduler {
     private final PropertyStore propStore;
     private final BackupConfig backupConfig;
     private final ScheduledExecutorService executor;
-    private final BackupTaskFactory backupTaskFactory;
+    private final TaskFactory taskFactory;
 
     public BackupScheduler(final PropertyStore propStore,
                            final BackupConfig backupConfig,
-                           final BackupTaskFactory backupTaskFactory) {
+                           final TaskFactory taskFactory) {
         this.propStore = propStore;
         this.backupConfig = backupConfig;
-        this.backupTaskFactory = backupTaskFactory;
+        this.taskFactory = taskFactory;
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
     }
 
@@ -55,7 +55,7 @@ public class BackupScheduler {
                                 .stream()
                                 .map(schema -> Tuple.of(db.name(), schema))
                 )
-                .map(tuple -> backupTaskFactory.createBackupTask(propStore, tuple._1, tuple._2))
+                .map(tuple -> taskFactory.createBackupTask(propStore, tuple._1, tuple._2))
                 .forEach(task -> executor.scheduleAtFixedRate(task, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS));
     }
 
