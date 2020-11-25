@@ -19,12 +19,15 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
+import java.util.Map;
 import java.util.Properties;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,6 +45,7 @@ public class BackupTaskTest {
     private BackupTask backupTask;
     @Mock
     private Process process;
+    private TestProcessProvider testProcessProvider;
 
     @BeforeEach
     public void setup() {
@@ -52,7 +56,8 @@ public class BackupTaskTest {
         props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, PASSWORD);
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
         propStore = new PropertyStore(props);
-        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME);
+        testProcessProvider = new TestProcessProvider(process);
+        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, testProcessProvider);
     }
 
     @Test
@@ -64,6 +69,31 @@ public class BackupTaskTest {
     @Test
     public void test_run_cantFindData() {
         throw new RuntimeException();
+    }
+
+    private static class TestProcessProvider implements ProcessProvider {
+        private String[] command = null;
+        private Map<String,String> environment = null;
+        private final Process mockProcess;
+
+        public TestProcessProvider(final Process mockProcess) {
+            this.mockProcess = mockProcess;
+        }
+
+        @Override
+        public Process provide(final String[] command, final Map<String, String> environment) throws IOException {
+            this.command = command;
+            this.environment = environment;
+            return mockProcess;
+        }
+
+        public Option<String[]> getCommand() {
+            return Option.of(command);
+        }
+
+        public Option<Map<String,String>> getEnvironment() {
+            return Option.of(environment);
+        }
     }
 
 }
