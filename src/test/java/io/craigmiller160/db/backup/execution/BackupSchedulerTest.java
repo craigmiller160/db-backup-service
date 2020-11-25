@@ -23,6 +23,7 @@ import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +61,11 @@ public class BackupSchedulerTest {
         ));
         backupTaskFactory = new TestTaskFactory();
         backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory);
+    }
+
+    @AfterEach
+    public void after() {
+        backupScheduler.stop();
     }
 
     @Test

@@ -18,18 +18,19 @@
 
 package io.craigmiller160.db.backup.execution;
 
-import io.craigmiller160.db.backup.properties.PropertyStore;
-
 import java.util.function.Consumer;
 
-public class TaskFactory {
+public class LivenessCheckTask implements Runnable {
 
-    public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
-        return new BackupTask(propStore, database, schema);
+    private final Consumer<Long> timestampConsumer;
+
+    public LivenessCheckTask(final Consumer<Long> timestampConsumer) {
+        this.timestampConsumer = timestampConsumer;
     }
 
-    public Runnable createLivenessCheckTask(final Consumer<Long> timestampConsumer) {
-        return new LivenessCheckTask(timestampConsumer);
+    @Override
+    public void run() {
+        timestampConsumer.accept(System.currentTimeMillis());
     }
 
 }
