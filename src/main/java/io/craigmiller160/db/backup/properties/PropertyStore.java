@@ -18,6 +18,10 @@
 
 package io.craigmiller160.db.backup.properties;
 
+import io.vavr.control.Option;
+import io.vavr.control.Try;
+
+import java.util.Map;
 import java.util.Properties;
 
 public class PropertyStore {
@@ -31,12 +35,32 @@ public class PropertyStore {
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
 
-    // TODO add validation to the properties when they are first read
+    private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
+            Map.of(
+                    DB_POSTGRES_HOST, PropertyValidator.IS_NOT_BLANK,
+                    DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC,
+                    DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK,
+                    DB_POSTGRES_PASSWORD, PropertyValidator.IS_NOT_BLANK,
+                    EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC,
+                    EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC,
+                    OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK,
+                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK
+            );
 
     private final Properties props;
 
     public PropertyStore(final Properties props) {
         this.props = props;
+    }
+
+    public void validateProperties() {
+
+    }
+
+    private boolean doValidate(final String key) {
+        return Option.of(props.getProperty(key))
+                .filter(theValue -> !theValue.isBlank())
+                .isDefined();
     }
 
     public String getPostgresHost() {
