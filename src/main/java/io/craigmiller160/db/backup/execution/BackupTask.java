@@ -103,13 +103,14 @@ public class BackupTask implements Runnable {
     private Try<String> writeToFile(final String dbBackupText) {
         final var outputRootDir = new File(propStore.getOutputRootDirectory());
         final var dbOutputDir = new File(outputRootDir, database);
+        final var schemaOutputDir = new File(dbOutputDir, schema);
 
-        if (!dbOutputDir.exists() && !dbOutputDir.mkdirs()) {
-            return Try.failure(new BackupException(String.format("Unable to create output directory: %s", dbOutputDir.getAbsolutePath())));
+        if (!schemaOutputDir.exists() && !schemaOutputDir.mkdirs()) {
+            return Try.failure(new BackupException(String.format("Unable to create output directory: %s", schemaOutputDir.getAbsolutePath())));
         }
 
         final var timestamp = FORMAT.format(ZonedDateTime.now(ZoneId.of(TIME_ZONE)));
-        final var outputFile = new File(dbOutputDir, String.format("backup_%s.sql", timestamp));
+        final var outputFile = new File(schemaOutputDir, String.format("backup_%s.sql", timestamp));
 
         return Try.withResources(() -> new FileWriter(outputFile))
                 .of(writer -> {
