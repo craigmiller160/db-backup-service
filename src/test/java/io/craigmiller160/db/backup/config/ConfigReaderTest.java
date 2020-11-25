@@ -20,15 +20,27 @@ package io.craigmiller160.db.backup.config;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ConfigReaderTest {
 
-    private final ConfigReader configReader = new ConfigReader();
+    private PropertyStore propStore;
+    private ConfigReader configReader;
+
+    @BeforeEach
+    public void setup() {
+        final var properties = new Properties();
+        properties.setProperty("config.file", "backup_config.json");
+        propStore = new PropertyStore(properties);
+        configReader = new ConfigReader(propStore);
+    }
 
     @Test
     public void test_readBackupConfig() throws Exception {
