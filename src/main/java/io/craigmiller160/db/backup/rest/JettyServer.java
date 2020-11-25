@@ -27,9 +27,14 @@ import org.glassfish.jersey.servlet.ServletContainer;
 
 public class JettyServer {
 
+    private final PropertyStore propStore;
     private Server server;
 
-    public Try<Void> start(final PropertyStore propStore) {
+    public JettyServer(final PropertyStore propStore) {
+        this.propStore = propStore;
+    }
+
+    public Try<Void> start() {
         server = new Server(propStore.getJettyPort());
         final var handler = new ServletContextHandler(server, "/");
 
