@@ -22,7 +22,7 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 
 public class BackupTaskFactory {
 
-    public BackupTask createBackupTask(final PropertyStore propStore, final String database, final String schema) {
+    public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
         return new BackupTask(propStore, database, schema);
     }
 

@@ -54,7 +54,7 @@ public class BackupScheduler {
                                 .stream()
                                 .map(schema -> Tuple.of(db.name(), schema))
                 )
-                .map(tuple -> new BackupTask(propStore, tuple._1, tuple._2))
+                .map(tuple -> backupTaskFactory.createBackupTask(propStore, tuple._1, tuple._2))
                 .forEach(task -> executor.scheduleAtFixedRate(task, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS));
     }
 
