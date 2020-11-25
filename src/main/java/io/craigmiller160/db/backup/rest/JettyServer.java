@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.rest;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -28,7 +29,7 @@ public class JettyServer {
 
     private Server server;
 
-    public void start(final PropertyStore propStore) {
+    public Try<Void> start(final PropertyStore propStore) {
         server = new Server(propStore.getJettyPort());
         final var handler = new ServletContextHandler(server, "/");
 
@@ -37,7 +38,15 @@ public class JettyServer {
         jerseyServletHolder.setInitParameter("javax.ws.rs.Application", AppResourceConfig.class.getName());
         handler.addServlet(jerseyServletHolder, "/");
 
-        server.start();
+        return Try.run(() -> server.start());
+    }
+
+    public Try<Void> stop() {
+        return Try.run(() -> {
+            if (server != null) {
+                server.stop();
+            }
+        });
     }
 
 }
