@@ -26,7 +26,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JettyServer {
+public class JettyServer { // TODO delete this if alternate plan works
 
     private static final Logger log = LoggerFactory.getLogger(JettyServer.class);
 
