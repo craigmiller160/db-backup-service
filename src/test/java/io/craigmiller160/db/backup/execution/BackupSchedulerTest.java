@@ -80,7 +80,6 @@ public class BackupSchedulerTest {
 
         @Override
         public Runnable createBackupTask(PropertyStore propStore, String database, String schema) {
-            System.out.println("Creating task: " + database + " " + schema); // TODO delete this
             return () -> {
                 taskProps.add(Tuple.of(database, schema));
             };
