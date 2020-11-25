@@ -5,5 +5,6 @@ RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-k
 RUN apt update
 RUN apt install postgresql-client-12 -y
 
+COPY build/db-backup-service-*.jar /db-backup-service.jar
 
-# java -jar --enable-preview target/db-backup-service-1.0.0-SNAPSHOT.jar
+ENTRYPOINT ["java", "-jar", "--enable-preview", "db-backup-service.jar"]
