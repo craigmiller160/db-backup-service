@@ -29,8 +29,8 @@ public class TaskFactory {
         return new BackupTask(propStore, database, schema);
     }
 
-    public Runnable createLivenessCheckTask(final AtomicLong livenessTimestamp) {
-        return new LivenessCheckTask(livenessTimestamp);
+    public Runnable createLivenessCheckTask(final PropertyStore propStore, final AtomicLong livenessTimestamp) {
+        return new LivenessCheckTask(propStore, livenessTimestamp);
     }
 
 }

@@ -54,7 +54,7 @@ public class BackupScheduler {
     }
 
     public void start() {
-        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(livenessTimestamp), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore, livenessTimestamp), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
         backupConfig.databases()
                 .stream()
                 .flatMap(db ->

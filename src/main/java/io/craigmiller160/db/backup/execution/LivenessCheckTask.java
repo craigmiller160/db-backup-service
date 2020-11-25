@@ -18,22 +18,27 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
+
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
 
 public class LivenessCheckTask implements Runnable {
 
+    // TODO need to be able to handle the root directory for unit tests
+
     private static final String LIVENESS_SCRIPT = "liveness.sh";
 
+    private final PropertyStore propStore;
     private final AtomicLong livenessTimestamp;
 
-    public LivenessCheckTask(final AtomicLong livenessTimestamp) {
+    public LivenessCheckTask(final PropertyStore propStore, final AtomicLong livenessTimestamp) {
+        this.propStore = propStore;
         this.livenessTimestamp = livenessTimestamp;
     }
 
     @Override
     public void run() {
-//        timestampConsumer.accept(System.currentTimeMillis());
+        final var currentTimestamp = System.currentTimeMillis();
     }
 
 }
