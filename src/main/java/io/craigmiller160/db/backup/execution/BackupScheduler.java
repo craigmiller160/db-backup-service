@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class BackupScheduler {
 
@@ -38,7 +37,6 @@ public class BackupScheduler {
     private final BackupConfig backupConfig;
     private final ScheduledExecutorService executor;
     private final TaskFactory taskFactory;
-    private final AtomicLong livenessTimestamp = new AtomicLong(0);
 
     public BackupScheduler(final PropertyStore propStore,
                            final BackupConfig backupConfig,
@@ -49,12 +47,8 @@ public class BackupScheduler {
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
     }
 
-    public long getLivenessTimestamp() {
-        return livenessTimestamp.get();
-    }
-
     public void start() {
-        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore, livenessTimestamp), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+        this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
         backupConfig.databases()
                 .stream()
                 .flatMap(db ->

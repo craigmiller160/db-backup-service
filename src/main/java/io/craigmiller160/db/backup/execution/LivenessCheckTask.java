@@ -50,11 +50,9 @@ public class LivenessCheckTask implements Runnable {
             """;
 
     private final PropertyStore propStore;
-    private final AtomicLong livenessTimestamp; // TODO this one might not be necessary anymore
 
-    public LivenessCheckTask(final PropertyStore propStore, final AtomicLong livenessTimestamp) {
+    public LivenessCheckTask(final PropertyStore propStore) {
         this.propStore = propStore;
-        this.livenessTimestamp = livenessTimestamp;
     }
 
     @Override
