@@ -14,6 +14,16 @@ This requires `pg_dump` to be available on the host system. To install it, run t
 sudo apt install -y postgresql-client
 ```
 
+## Running in Development
+
+Use IntelliJ to run the `Runner.java` file.
+
+## Deploying to Production
+
+First, an output directory needs to be configured on the local filesystem. The Kubernetes volume will point to `/opt/kubernetes/data/db-backup-service`, however that path should be symlinked so that it points to an external hard drive. That way the data is written to a place that will not be affected if the hard drive with the OS needs to be wiped/reinstalled.
+
+Now, fully build the application with `mvn clean package`. Then, run the `deploy.sh` script to deploy it to Kubernetes in production.
+
 ## Adding Databases/Schemas to Backup
 
 There is a file, `backup_config_prod.json`, in the root of the resources directory. Update this with the database/schema names and re-release to include it in the backup.

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-backup-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-backup-service
+  template:
+    metadata:
+      labels:
+        app: db-backup-service
+    spec:
+      containers:
+        - name: db-backup-service
+          image: localhost:32000/db-backup-service:1.0.0-SNAPSHOT.1
+          envFrom:
+            - configMapRef:
+                name: db-backup-service-configmap
+          volumeMounts:
+            - mountPath: /output
+              name: db-backup-service-volume
+      volumes:
+        - name: db-backup-service-volume
+          hostPath:
+            path: /opt/kubernetes/data/db-backup-service

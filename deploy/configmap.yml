@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-backup-service-configmap
+data:
+  db.postgres.host: postgres-service
+  db.postgres.port: "5432"
+  db.postgres.user: user
+  db.postgres.password: password
+  config.file: backup_config_prod.json
+  output.root-directory: /output
+  executor.interval-secs: "3600"

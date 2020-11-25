@@ -4,3 +4,7 @@ RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" >
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN apt update
 RUN apt install postgresql-client-12 -y
+
+COPY build/db-backup-service-*.jar /db-backup-service.jar
+
+ENTRYPOINT ["java", "-jar", "--enable-preview", "db-backup-service.jar"]
