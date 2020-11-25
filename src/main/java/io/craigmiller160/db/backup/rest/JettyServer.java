@@ -22,8 +22,6 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,11 +40,6 @@ public class JettyServer {
         log.info("Starting Jetty server on port {}", propStore.getJettyPort());
         server = new Server(propStore.getJettyPort());
         final var handler = new ServletContextHandler(server, "/");
-
-        final var jerseyServletHolder = new ServletHolder("JerseyServlet", ServletContainer.class);
-        jerseyServletHolder.setInitOrder(0);
-        jerseyServletHolder.setInitParameter("javax.ws.rs.Application", AppResourceConfig.class.getName());
-        handler.addServlet(jerseyServletHolder, "/");
 
         return Try.run(() -> server.start());
     }
