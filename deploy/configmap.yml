@@ -8,6 +8,5 @@ data:
   db.postgres.user: user
   db.postgres.password: password
   config.file: backup_config_prod.json
-  # TODO work on the output dir so it writes to external source
   output.root-directory: /output
   executor.interval-secs: "3600"

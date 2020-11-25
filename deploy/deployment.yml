@@ -18,3 +18,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: db-backup-service-configmap
+          volumeMounts:
+            - mountPath: /output
+              name: db-backup-service-volume
+      volumes:
+        - name: db-backup-service-volume
+          hostPath:
+            path: /opt/kubernetes/data/db-backup-service
