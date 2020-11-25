@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
@@ -68,7 +69,7 @@ public class BackupSchedulerTest {
         assertTrue(backupScheduler.stop());
         final var taskProps = backupTaskFactory.getTaskProps();
         assertEquals(3, taskProps.size());
-        taskProps.sort((t1, t2) -> t1._2.compareTo(t2._2));
+        taskProps.sort(Comparator.comparing(t -> t._2));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_1), taskProps.get(0));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_2), taskProps.get(1));
         assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), taskProps.get(2));
