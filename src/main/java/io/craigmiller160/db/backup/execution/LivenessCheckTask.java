@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LivenessCheckTask implements Runnable {
 
-    // TODO need to be able to handle the root directory for unit tests
+    // TODO needs to be added to unit tests... somehow
 
     private static final Logger log = LoggerFactory.getLogger(LivenessCheckTask.class);
 
