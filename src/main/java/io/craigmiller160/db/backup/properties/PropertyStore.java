@@ -19,10 +19,8 @@
 package io.craigmiller160.db.backup.properties;
 
 import io.craigmiller160.db.backup.exception.PropertyException;
-import io.vavr.Tuple;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
-import io.vavr.control.Option;
 import io.vavr.control.Try;
 
 import java.util.NoSuchElementException;
