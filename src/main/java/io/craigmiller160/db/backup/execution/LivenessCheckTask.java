@@ -18,19 +18,22 @@
 
 package io.craigmiller160.db.backup.execution;
 
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 public class LivenessCheckTask implements Runnable {
 
-    private final Consumer<Long> timestampConsumer;
+    private static final String LIVENESS_SCRIPT = "liveness.sh";
 
-    public LivenessCheckTask(final Consumer<Long> timestampConsumer) {
-        this.timestampConsumer = timestampConsumer;
+    private final AtomicLong livenessTimestamp;
+
+    public LivenessCheckTask(final AtomicLong livenessTimestamp) {
+        this.livenessTimestamp = livenessTimestamp;
     }
 
     @Override
     public void run() {
-        timestampConsumer.accept(System.currentTimeMillis());
+//        timestampConsumer.accept(System.currentTimeMillis());
     }
 
 }

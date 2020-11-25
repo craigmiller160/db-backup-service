@@ -20,6 +20,7 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 public class TaskFactory {
@@ -28,8 +29,8 @@ public class TaskFactory {
         return new BackupTask(propStore, database, schema);
     }
 
-    public Runnable createLivenessCheckTask(final Consumer<Long> timestampConsumer) {
-        return new LivenessCheckTask(timestampConsumer);
+    public Runnable createLivenessCheckTask(final AtomicLong livenessTimestamp) {
+        return new LivenessCheckTask(livenessTimestamp);
     }
 
 }
