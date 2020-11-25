@@ -19,11 +19,13 @@
 package io.craigmiller160.db.backup.properties;
 
 import io.craigmiller160.db.backup.exception.PropertyException;
+import io.vavr.Tuple;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
+import java.util.NoSuchElementException;
 import java.util.Properties;
 
 public class PropertyStore {
@@ -55,12 +57,18 @@ public class PropertyStore {
         this.props = props;
     }
 
-    public Try<String> validateProperties() {
-        // TODO so this fails because if nothing is found, it's still a Try.failure()
+    public Try<?> validateProperties() {
         return PROPERTY_VALIDATION_MAP
                 .find(entry -> !entry._2.validate(props.getProperty(entry._1)))
                 .toTry()
-                .flatMap(entry -> Try.failure(new PropertyException(String.format("Invalid property value: %s", entry._1))));
+                .flatMap(entry -> Try.failure(new PropertyException(String.format("Invalid property value: %s", entry._1))))
+                .recoverWith(ex -> {
+                    if (ex instanceof NoSuchElementException) {
+                        return Try.success("Found element");
+                    } else {
+                        return Try.failure(ex);
+                    }
+                });
     }
 
     public String getPostgresHost() {
