@@ -127,9 +127,10 @@
                 <version>3.3.0</version>
                 <configuration>
                     <descriptorRefs>
-                        <!-- TODO make this shorter if possible -->
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>${project.name}-${project.version}-full</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
                             <mainClass>io.craigmiller160.db.backup.Runner</mainClass>
