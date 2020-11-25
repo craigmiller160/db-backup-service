@@ -24,8 +24,12 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.servlet.ServletContainer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JettyServer {
+
+    private static final Logger log = LoggerFactory.getLogger(JettyServer.class);
 
     private final PropertyStore propStore;
     private Server server;
@@ -35,6 +39,7 @@ public class JettyServer {
     }
 
     public Try<Void> start() {
+        log.info("Starting Jetty server on port {}", propStore.getJettyPort());
         server = new Server(propStore.getJettyPort());
         final var handler = new ServletContextHandler(server, "/");
 
@@ -47,6 +52,7 @@ public class JettyServer {
     }
 
     public Try<Void> stop() {
+        log.info("Stopping Jetty server");
         return Try.run(() -> {
             if (server != null) {
                 server.stop();
