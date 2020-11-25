@@ -26,7 +26,7 @@
 
     <target name="copy" depends="clean">
         <copy todir="deploy/build">
-            <fileset dir="target" includes="db-backup-service-*-full.jar" />
+            <fileset dir="target" includes="db-backup-service-*.jar" />
         </copy>
     </target>
 </project>
