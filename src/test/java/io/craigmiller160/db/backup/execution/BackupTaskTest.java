@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 public class BackupTaskTest {
 
     @Test
-    public void test() {
+    public void test_run() {
         throw new RuntimeException();
     }
 
