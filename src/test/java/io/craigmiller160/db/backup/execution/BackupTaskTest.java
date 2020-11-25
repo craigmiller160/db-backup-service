@@ -18,9 +18,25 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Properties;
+
 public class BackupTaskTest {
+
+    private static final String DB_NAME = "DbName";
+    private static final String SCHEMA_NAME = "SchemaName";
+
+    private PropertyStore propStore;
+    private BackupTask backupTask;
+
+    @BeforeEach
+    public void setup() {
+        final var props = new Properties();
+        propStore = new PropertyStore(props);
+    }
 
     @Test
     public void test_run() {

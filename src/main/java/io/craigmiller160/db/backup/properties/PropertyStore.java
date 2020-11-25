@@ -18,20 +18,20 @@
 
 package io.craigmiller160.db.backup.properties;
 
-import io.craigmiller160.db.backup.exception.PropertyException;
-
 import java.util.Properties;
 
 public class PropertyStore {
 
-    private static final String DB_POSTGRES_HOST = "db.postgres.host";
-    private static final String DB_POSTGRES_PORT = "db.postgres.port";
-    private static final String DB_POSTGRES_USER = "db.postgres.user";
-    private static final String DB_POSTGRES_PASSWORD = "db.postgres.password";
-    private static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
-    private static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
-    private static final String OUTPUT_ROOT_DIR = "output.root-directory";
-    private static final String CONFIG_FILE = "config.file";
+    public static final String DB_POSTGRES_HOST = "db.postgres.host";
+    public static final String DB_POSTGRES_PORT = "db.postgres.port";
+    public static final String DB_POSTGRES_USER = "db.postgres.user";
+    public static final String DB_POSTGRES_PASSWORD = "db.postgres.password";
+    public static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
+    public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
+    public static final String OUTPUT_ROOT_DIR = "output.root-directory";
+    public static final String CONFIG_FILE = "config.file";
+
+    // TODO add validation to the properties when they are first read
 
     private final Properties props;
 

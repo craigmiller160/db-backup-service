@@ -51,8 +51,8 @@ public class BackupSchedulerTest {
     @BeforeEach
     public void setup() {
         final var properties = new Properties();
-        properties.setProperty("executor.thread-count", "4");
-        properties.setProperty("executor.interval-secs", "3000");
+        properties.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
+        properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "3000");
         propStore = new PropertyStore(properties);
         backupConfig = new BackupConfig(List.of(
                 new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),

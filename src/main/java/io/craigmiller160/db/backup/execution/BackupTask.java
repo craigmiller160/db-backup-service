@@ -47,6 +47,7 @@ public class BackupTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String TIME_ZONE = "US/Eastern";
+    private static final String PASSWORD_ENV = "PGPASSWORD";
 
     private final PropertyStore propStore;
     private final String database;
@@ -86,7 +87,7 @@ public class BackupTask implements Runnable {
                 propStore.getPostgresUser(),
                 USE_INSERT_STATEMENTS
         };
-        final var environment = Map.of("PGPASSWORD", propStore.getPostgresPassword());
+        final var environment = Map.of(PASSWORD_ENV, propStore.getPostgresPassword());
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readOutput)
                 .flatMap(this::writeToFile)
