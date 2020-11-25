@@ -36,6 +36,7 @@ public class PropertyStore {
     public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
+    public static final String JETTY_PORT = "jetty.port";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.of(
@@ -46,7 +47,8 @@ public class PropertyStore {
                     EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC,
                     EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC,
                     OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK,
-                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK
+                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK,
+                    JETTY_PORT, PropertyValidator.IS_NUMERIC
             );
 
     private final Properties props;
@@ -99,6 +101,10 @@ public class PropertyStore {
 
     public String getConfigFile() {
         return props.getProperty(CONFIG_FILE);
+    }
+
+    public int getJettyPort() {
+        return Integer.parseInt(props.getProperty(JETTY_PORT));
     }
 
 }
