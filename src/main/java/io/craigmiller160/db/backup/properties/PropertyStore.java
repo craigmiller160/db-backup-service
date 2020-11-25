@@ -18,10 +18,12 @@
 
 package io.craigmiller160.db.backup.properties;
 
+import io.craigmiller160.db.backup.exception.PropertyException;
+import io.vavr.collection.HashMap;
+import io.vavr.collection.Map;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
-import java.util.Map;
 import java.util.Properties;
 
 public class PropertyStore {
@@ -36,7 +38,7 @@ public class PropertyStore {
     public static final String CONFIG_FILE = "config.file";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
-            Map.of(
+            HashMap.of(
                     DB_POSTGRES_HOST, PropertyValidator.IS_NOT_BLANK,
                     DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC,
                     DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK,
@@ -53,14 +55,11 @@ public class PropertyStore {
         this.props = props;
     }
 
-    public void validateProperties() {
-
-    }
-
-    private boolean doValidate(final String key) {
-        return Option.of(props.getProperty(key))
-                .filter(theValue -> !theValue.isBlank())
-                .isDefined();
+    public Try<Void> validateProperties() {
+        return PROPERTY_VALIDATION_MAP
+                .find(entry -> !entry._2.validate(props.getProperty(entry._1)))
+                .toTry()
+                .flatMap(entry -> Try.failure(new PropertyException(String.format("Invalid property value: %s", entry._1))));
     }
 
     public String getPostgresHost() {
