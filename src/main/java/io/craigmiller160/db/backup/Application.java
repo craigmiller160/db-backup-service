@@ -22,7 +22,7 @@ import io.craigmiller160.db.backup.config.ConfigReader;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
 import io.craigmiller160.db.backup.execution.TaskFactory;
 import io.craigmiller160.db.backup.properties.PropertyReader;
-import io.craigmiller160.db.backup.rest.JettyServer;
+import io.craigmiller160.db.backup.server.JettyServer;
 import io.vavr.Tuple;
 import io.vavr.control.Option;
 import org.slf4j.Logger;

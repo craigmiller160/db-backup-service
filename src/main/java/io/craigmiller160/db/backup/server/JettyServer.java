@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.craigmiller160.db.backup.rest;
+package io.craigmiller160.db.backup.server;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
