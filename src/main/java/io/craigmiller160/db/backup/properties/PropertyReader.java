@@ -43,6 +43,7 @@ public class PropertyReader {
                     return props;
                 })
                 .map(PropertyStore::new)
+                .flatMap(propStore -> propStore.validateProperties().map(result -> propStore))
                 .recoverWith(ex -> Try.failure(new PropertyException("Error reading properties file", ex)));
     }
 
