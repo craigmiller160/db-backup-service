@@ -36,6 +36,7 @@ public class BackupTaskTest {
     private static final String PORT = "100";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
+    private static final String OUTPUT_ROOT = "";
 
     private PropertyStore propStore;
     private BackupTask backupTask;
@@ -49,6 +50,7 @@ public class BackupTaskTest {
         props.setProperty(PropertyStore.DB_POSTGRES_PORT, PORT);
         props.setProperty(PropertyStore.DB_POSTGRES_USER, USER);
         props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, PASSWORD);
+        props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
         propStore = new PropertyStore(props);
         backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME);
     }
@@ -56,6 +58,11 @@ public class BackupTaskTest {
     @Test
     public void test_run() {
         backupTask.run();
+        throw new RuntimeException();
+    }
+
+    @Test
+    public void test_run_cantFindData() {
         throw new RuntimeException();
     }
 
