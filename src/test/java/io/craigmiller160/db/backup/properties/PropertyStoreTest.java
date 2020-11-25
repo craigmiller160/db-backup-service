@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PropertyStoreTest {
@@ -57,12 +58,20 @@ public class PropertyStoreTest {
 
     @Test
     public void test_missingProperty() {
-        throw new RuntimeException();
+        props.remove(PropertyStore.DB_POSTGRES_HOST);
+        final var propStore = new PropertyStore(props);
+        final var result = propStore.validateProperties();
+        assertTrue(result.isFailure());
+        assertEquals("Invalid property value: db.postgres.host", result.getCause().getMessage());
     }
 
     @Test
     public void test_propertyShouldBeNumeric() {
-        throw new RuntimeException();
+        props.setProperty(PropertyStore.DB_POSTGRES_PORT, "abc");
+        final var propStore = new PropertyStore(props);
+        final var result = propStore.validateProperties();
+        assertTrue(result.isFailure());
+        assertEquals("Invalid property value: db.postgres.port", result.getCause().getMessage());
     }
 
 }
