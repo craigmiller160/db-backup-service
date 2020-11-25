@@ -36,7 +36,6 @@ public class PropertyStore {
     public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
-    public static final String JETTY_PORT = "jetty.port";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.of(
