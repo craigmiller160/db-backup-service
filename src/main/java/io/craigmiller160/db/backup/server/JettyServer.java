@@ -22,6 +22,7 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +41,9 @@ public class JettyServer {
         log.info("Starting Jetty server on port {}", propStore.getJettyPort());
         server = new Server(propStore.getJettyPort());
         final var handler = new ServletContextHandler(server, "/");
+
+        final var healthCheckServletHolder = new ServletHolder("HealthCheckServlet", HealthCheckServlet.class);
+        handler.addServlet(healthCheckServletHolder, "/healthcheck");
 
         return Try.run(() -> server.start());
     }
