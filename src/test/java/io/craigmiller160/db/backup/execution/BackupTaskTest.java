@@ -102,9 +102,10 @@ public class BackupTaskTest {
 
         final var outputRootDir = new File(OUTPUT_ROOT);
         final var outputDbDir = new File(outputRootDir, DB_NAME);
-        assertTrue(outputDbDir.exists());
+        final var outputSchemaDir = new File(outputDbDir, SCHEMA_NAME);
+        assertTrue(outputSchemaDir.exists());
 
-        final var files = outputDbDir.listFiles(file -> file.getName().endsWith(".sql"));
+        final var files = outputSchemaDir.listFiles(file -> file.getName().endsWith(".sql"));
         assertNotNull(files);
         assertEquals(1, files.length);
 
