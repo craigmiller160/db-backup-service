@@ -20,6 +20,7 @@ package io.craigmiller160.db.backup;
 
 import io.craigmiller160.db.backup.config.ConfigReader;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
+import io.craigmiller160.db.backup.execution.BackupTaskFactory;
 import io.craigmiller160.db.backup.properties.PropertyReader;
 import io.vavr.Tuple;
 import io.vavr.control.Option;
@@ -31,6 +32,7 @@ public class Application {
     private static final Logger log = LoggerFactory.getLogger(Application.class);
     private static final Object BACKUP_SCHEDULER_LOG = new Object();
 
+    private final BackupTaskFactory backupTaskFactory = new BackupTaskFactory();
     private BackupScheduler backupScheduler;
 
     public void start() {
@@ -44,7 +46,7 @@ public class Application {
                 .onSuccess(tuple -> {
                     log.info("Setting up scheduler");
                     synchronized (BACKUP_SCHEDULER_LOG) {
-                        backupScheduler = new BackupScheduler(tuple._1, tuple._2);
+                        backupScheduler = new BackupScheduler(tuple._1, tuple._2, backupTaskFactory);
                         backupScheduler.start();
                     }
                 })

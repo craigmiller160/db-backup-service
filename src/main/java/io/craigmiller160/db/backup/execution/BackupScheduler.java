@@ -35,10 +35,14 @@ public class BackupScheduler {
     private final PropertyStore propStore;
     private final BackupConfig backupConfig;
     private final ScheduledExecutorService executor;
+    private final BackupTaskFactory backupTaskFactory;
 
-    public BackupScheduler(final PropertyStore propStore, final BackupConfig backupConfig) {
+    public BackupScheduler(final PropertyStore propStore,
+                           final BackupConfig backupConfig,
+                           final BackupTaskFactory backupTaskFactory) {
         this.propStore = propStore;
         this.backupConfig = backupConfig;
+        this.backupTaskFactory = backupTaskFactory;
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
     }
 
