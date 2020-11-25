@@ -20,6 +20,8 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,20 +29,29 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BackupTaskTest {
 
+    private static final String DATA_CONTENT = "Success";
     private static final String DB_NAME = "DbName";
     private static final String SCHEMA_NAME = "SchemaName";
     private static final String HOST = "host";
     private static final String PORT = "100";
     private static final String USER = "user";
     private static final String PASSWORD = "password";
-    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target");
+    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
 
     private PropertyStore propStore;
     private BackupTask backupTask;
@@ -49,7 +60,8 @@ public class BackupTaskTest {
     private TestProcessProvider testProcessProvider;
 
     @BeforeEach
-    public void setup() {
+    public void setup() throws Exception {
+        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
         final var props = new Properties();
         props.setProperty(PropertyStore.DB_POSTGRES_HOST, HOST);
         props.setProperty(PropertyStore.DB_POSTGRES_PORT, PORT);
@@ -62,15 +74,42 @@ public class BackupTaskTest {
     }
 
     @Test
-    public void test_run() {
-        backupTask.run();
-        throw new RuntimeException();
-    }
+    public void test_run() throws Exception {
+        when(process.getInputStream())
+                .thenReturn(IOUtils.toInputStream(DATA_CONTENT, StandardCharsets.UTF_8));
 
-    @Test
-    public void test_run_cantFindData() {
-        // TODO not even sure how to write a test for this...
-        throw new RuntimeException();
+        backupTask.run();
+        final var expectedCommand = new String[] {
+                BackupTask.PG_DUMP_CMD,
+                DB_NAME,
+                BackupTask.SCHEMA_ARG,
+                SCHEMA_NAME,
+                BackupTask.HOST_ARG,
+                HOST,
+                BackupTask.PORT_ARG,
+                PORT,
+                BackupTask.USER_ARG,
+                USER,
+                BackupTask.USE_INSERT_STATEMENTS
+        };
+        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));
+
+        assertTrue(testProcessProvider.getEnvironment().isDefined());
+        assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
+
+        final var outputRootDir = new File(OUTPUT_ROOT);
+        final var outputDbDir = new File(outputRootDir, DB_NAME);
+        assertTrue(outputDbDir.exists());
+
+        final var files = outputDbDir.listFiles(file -> file.getName().endsWith(".sql"));
+        assertNotNull(files);
+        assertEquals(1, files.length);
+
+        final var fileContent = IOUtils.toString(new FileInputStream(files[0]), StandardCharsets.UTF_8);
+        assertEquals(DATA_CONTENT, fileContent);
     }
 
     private static class TestProcessProvider implements ProcessProvider {

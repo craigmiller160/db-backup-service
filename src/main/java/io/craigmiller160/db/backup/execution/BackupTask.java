@@ -37,17 +37,17 @@ import java.util.stream.Collectors;
 
 public class BackupTask implements Runnable {
 
-    private static final String PG_DUMP_CMD = "pg_dump";
-    private static final String HOST_ARG = "-h";
-    private static final String SCHEMA_ARG = "-n";
-    private static final String PORT_ARG = "-p";
-    private static final String USER_ARG = "-U";
-    private static final String USE_INSERT_STATEMENTS = "--column-inserts";
+    public static final String PG_DUMP_CMD = "pg_dump";
+    public static final String HOST_ARG = "-h";
+    public static final String SCHEMA_ARG = "-n";
+    public static final String PORT_ARG = "-p";
+    public static final String USER_ARG = "-U";
+    public static final String USE_INSERT_STATEMENTS = "--column-inserts";
 
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
     private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     private static final String TIME_ZONE = "US/Eastern";
-    private static final String PASSWORD_ENV = "PGPASSWORD";
+    public static final String PASSWORD_ENV = "PGPASSWORD";
 
     private final PropertyStore propStore;
     private final String database;
