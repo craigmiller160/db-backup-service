@@ -21,6 +21,13 @@ spec:
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - /output/liveness.sh
+            initialDelaySeconds: 60
+            periodSeconds: 1800
       volumes:
         - name: db-backup-service-volume
           hostPath:

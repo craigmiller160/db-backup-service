@@ -23,6 +23,7 @@ import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +46,7 @@ public class BackupSchedulerTest {
 
     private PropertyStore propStore;
     private BackupConfig backupConfig;
-    private TestBackupTaskFactory backupTaskFactory;
+    private TestTaskFactory backupTaskFactory;
     private BackupScheduler backupScheduler;
 
     @BeforeEach
@@ -58,8 +59,13 @@ public class BackupSchedulerTest {
                 new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
                 new DatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
         ));
-        backupTaskFactory = new TestBackupTaskFactory();
+        backupTaskFactory = new TestTaskFactory();
         backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory);
+    }
+
+    @AfterEach
+    public void after() {
+        backupScheduler.stop();
     }
 
     @Test
@@ -75,7 +81,7 @@ public class BackupSchedulerTest {
         assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), taskProps.get(2));
     }
 
-    private static class TestBackupTaskFactory extends BackupTaskFactory {
+    private static class TestTaskFactory extends TaskFactory {
         private final List<Tuple2<String,String>> taskProps = Collections.synchronizedList(new ArrayList<>());
 
         @Override

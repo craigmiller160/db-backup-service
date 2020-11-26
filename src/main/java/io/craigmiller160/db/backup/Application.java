@@ -20,7 +20,7 @@ package io.craigmiller160.db.backup;
 
 import io.craigmiller160.db.backup.config.ConfigReader;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
-import io.craigmiller160.db.backup.execution.BackupTaskFactory;
+import io.craigmiller160.db.backup.execution.TaskFactory;
 import io.craigmiller160.db.backup.properties.PropertyReader;
 import io.vavr.Tuple;
 import io.vavr.control.Option;
@@ -30,23 +30,23 @@ import org.slf4j.LoggerFactory;
 public class Application {
 
     private static final Logger log = LoggerFactory.getLogger(Application.class);
-    private static final Object BACKUP_SCHEDULER_LOG = new Object();
+    private static final Object LOCK = new Object();
 
-    private final BackupTaskFactory backupTaskFactory = new BackupTaskFactory();
+    private final TaskFactory taskFactory = new TaskFactory();
     private BackupScheduler backupScheduler;
 
     public void start() {
         log.info("Starting application");
         new PropertyReader().readProperties()
-                .map(propStore ->
+                .flatMap(propStore ->
                         new ConfigReader(propStore).readBackupConfig()
                                 .map(config -> Tuple.of(propStore, config))
                 )
-                .flatMap(tupleTry -> tupleTry)
                 .onSuccess(tuple -> {
+
                     log.info("Setting up scheduler");
-                    synchronized (BACKUP_SCHEDULER_LOG) {
-                        backupScheduler = new BackupScheduler(tuple._1, tuple._2, backupTaskFactory);
+                    synchronized (LOCK) {
+                        backupScheduler = new BackupScheduler(tuple._1, tuple._2, taskFactory);
                         backupScheduler.start();
                     }
                 })
@@ -56,7 +56,7 @@ public class Application {
     // TODO how to trigger this when application is shutting down?
     public void stop() {
         log.info("Stopping scheduler");
-        synchronized (BACKUP_SCHEDULER_LOG) {
+        synchronized (LOCK) {
             Option.of(backupScheduler)
                     .forEach(BackupScheduler::stop);
         }
