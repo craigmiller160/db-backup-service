@@ -23,6 +23,7 @@ import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.control.Option;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -73,32 +75,42 @@ public class BackupSchedulerTest {
         backupScheduler.start();
         Thread.sleep(1000);
         assertTrue(backupScheduler.stop());
-        final var taskProps = backupTaskFactory.getTaskProps();
-        assertEquals(3, taskProps.size());
-        taskProps.sort(Comparator.comparing(t -> t._2));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), taskProps.get(0));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), taskProps.get(1));
-        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), taskProps.get(2));
+
+        final var backupTaskProps = backupTaskFactory.getBackupTaskProps();
+        assertEquals(3, backupTaskProps.size());
+        backupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), backupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), backupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), backupTaskProps.get(2));
+
+        final var livenessCheckPropStore = backupTaskFactory.getLivenessCheckPropStore();
+        assertTrue(livenessCheckPropStore.isDefined());
     }
 
     private static class TestTaskFactory extends TaskFactory {
-        private final List<Tuple2<String,String>> taskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> backupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
 
         @Override
         public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
             return () -> {
-                taskProps.add(Tuple.of(database, schema));
+                backupTaskProps.add(Tuple.of(database, schema));
             };
         }
 
         @Override
         public Runnable createLivenessCheckTask(final PropertyStore propStore) {
-            // TODO finish this
-            throw new RuntimeException();
+            return () -> {
+                livenessCheckPropStore.set(propStore);
+            };
         }
 
-        public List<Tuple2<String,String>> getTaskProps() {
-            return new ArrayList<>(taskProps);
+        public List<Tuple2<String,String>> getBackupTaskProps() {
+            return new ArrayList<>(backupTaskProps);
+        }
+
+        public Option<PropertyStore> getLivenessCheckPropStore() {
+            return Option.of(livenessCheckPropStore.get());
         }
     }
 
