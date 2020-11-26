@@ -62,12 +62,14 @@ public class BackupTaskTest {
     @BeforeEach
     public void setup() throws Exception {
         FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+
         final var props = new Properties();
         props.setProperty(PropertyStore.DB_POSTGRES_HOST, HOST);
         props.setProperty(PropertyStore.DB_POSTGRES_PORT, PORT);
         props.setProperty(PropertyStore.DB_POSTGRES_USER, USER);
         props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, PASSWORD);
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
         backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, testProcessProvider);

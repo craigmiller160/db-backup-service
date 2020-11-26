@@ -18,9 +18,30 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.util.Properties;
+
 public class LivenessCheckTaskTest {
+
+    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
+
+    private LivenessCheckTask livenessCheckTask;
+
+    @BeforeEach
+    public void beforeEach() throws Exception {
+        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+
+        final var properties = new Properties();
+        properties.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+        final var propStore = new PropertyStore(properties);
+
+        livenessCheckTask = new LivenessCheckTask(propStore);
+    }
 
     @Test
     public void test_run() {

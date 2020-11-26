@@ -31,8 +31,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class LivenessCheckTask implements Runnable {
 
-    // TODO needs to be added to unit tests... somehow
-
     private static final Logger log = LoggerFactory.getLogger(LivenessCheckTask.class);
 
     private static final String LIVENESS_SCRIPT_FILE = "liveness.sh";
