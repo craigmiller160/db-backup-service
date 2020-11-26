@@ -19,20 +19,40 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.InputStreamReader;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LivenessCheckTaskTest {
 
     private static final ZonedDateTime TEST_NOW = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC"));
     private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
     private static final String INTERVAL_SECS = "30";
+    private static final String EXPECTED_TEXT = """
+            #!/bin/sh
+                        
+            current_timestamp=$(date +%s%3N)
+            max_timestamp=1577840521000
+                        
+            if [ $current_timestamp -gt $max_timestamp ]; then
+                exit 1
+            else
+                exit 0
+            fi""";
 
     private LivenessCheckTask livenessCheckTask;
 
@@ -49,8 +69,16 @@ public class LivenessCheckTaskTest {
     }
 
     @Test
-    public void test_run() {
+    public void test_run() throws Exception {
         livenessCheckTask.run();
+        Thread.sleep(500);
+
+        final var livenessFile = new File(new File(OUTPUT_ROOT), LivenessCheckTask.LIVENESS_SCRIPT_FILE);
+        assertTrue(livenessFile.exists());
+        final var text = Try.withResources(() -> new BufferedReader(new InputStreamReader(new FileInputStream(livenessFile))))
+                .of(reader -> reader.lines().collect(Collectors.joining("\n")))
+                .get();
+        assertEquals(EXPECTED_TEXT, text);
     }
 
     private static class TestLivenessCheckTask extends LivenessCheckTask {

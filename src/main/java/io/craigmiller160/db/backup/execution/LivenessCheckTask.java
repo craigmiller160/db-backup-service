@@ -27,13 +27,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class LivenessCheckTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(LivenessCheckTask.class);
 
-    private static final String LIVENESS_SCRIPT_FILE = "liveness.sh";
+    public static final String LIVENESS_SCRIPT_FILE = "liveness.sh";
     private static final String LIVENESS_SCRIPT_TEMPLATE = """
             #!/bin/sh
             
@@ -65,7 +64,7 @@ public class LivenessCheckTask implements Runnable {
         final var script = LIVENESS_SCRIPT_TEMPLATE.formatted(maxTimestamp);
         final var outputDir = new File(propStore.getOutputRootDirectory());
 
-        if (!outputDir.exists() && outputDir.mkdirs()) {
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
             log.error(String.format("Unable to write liveness script file because Output Directory cannot be created: %s", propStore.getOutputRootDirectory()));
             return;
         }
