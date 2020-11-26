@@ -85,10 +85,16 @@ public class BackupSchedulerTest {
         private final List<Tuple2<String,String>> taskProps = Collections.synchronizedList(new ArrayList<>());
 
         @Override
-        public Runnable createBackupTask(PropertyStore propStore, String database, String schema) {
+        public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
             return () -> {
                 taskProps.add(Tuple.of(database, schema));
             };
+        }
+
+        @Override
+        public Runnable createLivenessCheckTask(final PropertyStore propStore) {
+            // TODO finish this
+            throw new RuntimeException();
         }
 
         public List<Tuple2<String,String>> getTaskProps() {
