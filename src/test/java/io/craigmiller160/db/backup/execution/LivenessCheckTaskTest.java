@@ -24,11 +24,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Properties;
 
 public class LivenessCheckTaskTest {
 
+    private static final ZonedDateTime TEST_NOW = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("UTC"));
     private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
+    private static final String INTERVAL_SECS = "30";
 
     private LivenessCheckTask livenessCheckTask;
 
@@ -38,14 +42,26 @@ public class LivenessCheckTaskTest {
 
         final var properties = new Properties();
         properties.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+        properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, INTERVAL_SECS);
         final var propStore = new PropertyStore(properties);
 
-        livenessCheckTask = new LivenessCheckTask(propStore);
+        livenessCheckTask = new TestLivenessCheckTask(propStore);
     }
 
     @Test
     public void test_run() {
-        throw new RuntimeException();
+        livenessCheckTask.run();
+    }
+
+    private static class TestLivenessCheckTask extends LivenessCheckTask {
+        public TestLivenessCheckTask(final PropertyStore propStore) {
+            super(propStore);
+        }
+
+        @Override
+        protected ZonedDateTime nowUtc() {
+            return TEST_NOW;
+        }
     }
 
 }

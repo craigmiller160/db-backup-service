@@ -57,13 +57,19 @@ public class LivenessCheckTask implements Runnable {
     public void run() {
         log.debug("Updating liveness check script");
 
-        final var maxTimestamp = ZonedDateTime.now(ZoneId.of("UTC"))
+        final var maxTimestamp = nowUtc()
                 .plusSeconds(propStore.getExecutorIntervalSecs() * 2)
                 .toInstant()
                 .toEpochMilli();
 
         final var script = LIVENESS_SCRIPT_TEMPLATE.formatted(maxTimestamp);
         final var outputDir = new File(propStore.getOutputRootDirectory());
+
+        if (!outputDir.exists() && outputDir.mkdirs()) {
+            log.error(String.format("Unable to write liveness script file because Output Directory cannot be created: %s", propStore.getOutputRootDirectory()));
+            return;
+        }
+
         final var livenessFile = new File(outputDir, LIVENESS_SCRIPT_FILE);
 
         Try.withResources(() -> new FileWriter(livenessFile))
@@ -73,6 +79,10 @@ public class LivenessCheckTask implements Runnable {
                 })
                 .onSuccess(writer -> log.info("Successfully updated liveness check script"))
                 .onFailure(ex -> log.error("Error updating liveness check script", ex));
+    }
+
+    protected ZonedDateTime nowUtc() {
+        return ZonedDateTime.now(ZoneId.of("UTC"));
     }
 
 }
