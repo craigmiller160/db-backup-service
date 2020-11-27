@@ -27,7 +27,7 @@ spec:
                 - sh
                 - /output/liveness.sh
             initialDelaySeconds: 60
-            periodSeconds: 1800
+            periodSeconds: 300
       volumes:
         - name: db-backup-service-volume
           hostPath:
