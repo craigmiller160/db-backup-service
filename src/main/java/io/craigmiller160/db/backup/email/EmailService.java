@@ -67,7 +67,7 @@ public class EmailService {
     public EmailService(final PropertyStore propStore, final Supplier<HttpClient> clientSupplier) {
         this.propStore = propStore;
         this.objectMapper = new ObjectMapper();
-        this.httpClient = createHttpClient(propStore);
+        this.httpClient = clientSupplier.get();
     }
 
     private static HttpClient createHttpClient(final PropertyStore propStore) {
