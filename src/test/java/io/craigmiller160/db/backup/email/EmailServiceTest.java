@@ -24,6 +24,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,14 +34,23 @@ import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Flow;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,6 +62,8 @@ public class EmailServiceTest {
     private static final String AUTH_EMAIL_CLIENT_KEY = "ABC";
     private static final String AUTH_EMAIL_CLIENT_SECRET = "DEF";
     private static final String ACCESS_TOKEN = "accessToken";
+    private static final String USER = "user";
+    private static final String PASSWORD = "password";
     private static final String DATABASE = "database";
     private static final String SCHEMA = "schema";
     private static final Exception EXCEPTION = new Exception("Dying");
@@ -72,19 +84,93 @@ public class EmailServiceTest {
         properties.setProperty(PropertyStore.EMAIL_AUTH_HOST, AUTH_HOST);
         properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, AUTH_EMAIL_CLIENT_KEY);
         properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
+        properties.setProperty(PropertyStore.EMAIL_AUTH_USER, USER);
+        properties.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, PASSWORD);
         propStore = new PropertyStore(properties);
         emailService = new TestEmailService(propStore, () -> httpClient);
     }
 
     @Test
     public void test_sendErrorAlertEmail() throws Exception {
-        emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
-
         final var tokenResponseDto = new TokenResponse(ACCESS_TOKEN, "", "");
         final var tokenResponse = new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
+        final var emailResponse = new TestHttpResponse(204, "");
+        final var tokenRequest = String.format("grant_type=password&username=%s&password=%s", USER, PASSWORD);
+
+        final var emailRequestDto = new EmailRequest(
+                List.of(EMAIL_TO),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                EmailService.ERROR_ALERT_SUBJECT,
+                EmailService.ERROR_ALERT_MESSAGE.formatted(
+                        DATABASE, SCHEMA, NOW.format(EmailService.FORMATTER),
+                        String.format("%s - %s", EXCEPTION.getClass().getName(), EXCEPTION.getMessage())
+                )
+        );
+        final var emailRequest = objectMapper.writeValueAsString(emailRequestDto);
 
         when(httpClient.send(any(), any()))
-                .thenReturn(tokenResponse);
+                .thenReturn(tokenResponse)
+                .thenReturn(emailResponse);
+
+        emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
+
+        final var requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        verify(httpClient, times(2))
+                .send(requestCaptor.capture(), any());
+        assertEquals(2, requestCaptor.getAllValues().size());
+        testHttpRequest(requestCaptor.getAllValues().get(0), URI.create(String.format("%s%s", AUTH_HOST, EmailService.TOKEN_URI)), tokenRequest);
+        testHttpRequest(requestCaptor.getAllValues().get(1), URI.create(String.format("%s%s", EMAIL_HOST, EmailService.EMAIL_URI)), emailRequest);
+    }
+
+    private void testHttpRequest(final HttpRequest request, final URI expectedUri, final String expectedBody) {
+        assertEquals(expectedUri, request.uri());
+        assertEquals("POST", request.method());
+        var publisher = request.bodyPublisher().get();
+
+        final var subscriber = new TestSubscriber<>();
+        publisher.subscribe(subscriber);
+        final var contentArray = ((ByteBuffer) subscriber.getBodyItems().get(0)).array();
+        final var textContent = new String(contentArray);
+
+        assertEquals(expectedBody, textContent);
+    }
+
+    private static class TestSubscriber<T> implements Flow.Subscriber<T> {
+
+        private final List<T> bodyItems = new ArrayList<>();
+        private final CountDownLatch latch = new CountDownLatch(1);
+
+        public List<T> getBodyItems() {
+            try {
+                latch.await(5000L, TimeUnit.MILLISECONDS);
+                return bodyItems;
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        @Override
+        public void onSubscribe(final Flow.Subscription subscription) {
+            subscription.request(Long.MAX_VALUE);
+        }
+
+        @Override
+        public void onNext(final T item) {
+            bodyItems.add(item);
+        }
+
+        @Override
+        public void onError(final Throwable throwable) {
+            throwable.printStackTrace();
+            latch.countDown();;
+        }
+
+        @Override
+        public void onComplete() {
+            latch.countDown();
+        }
     }
 
     private static class TestEmailService extends EmailService {

@@ -43,11 +43,11 @@ public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
-    private static final String TOKEN_URI = "/oauth/token";
-    private static final String EMAIL_URI = "/email";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
-    private static final String ERROR_ALERT_MESSAGE = """
+    public static final String TOKEN_URI = "/oauth/token";
+    public static final String EMAIL_URI = "/email";
+    public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
+    public static final String ERROR_ALERT_MESSAGE = """
             Database Backup Failed
             
             Database: %s

@@ -19,6 +19,7 @@
         <mockito.version>3.6.0</mockito.version>
         <commons.io.version>2.8.0</commons.io.version>
         <commons.lang.verison>3.11</commons.lang.verison>
+        <hamcrest.version>2.2</hamcrest.version>
     </properties>
 
     <dependencies>
@@ -86,6 +87,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>${commons.lang.verison}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
