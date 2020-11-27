@@ -20,6 +20,7 @@ package io.craigmiller160.db.backup.email;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.craigmiller160.db.backup.exception.HttpResponseException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
@@ -87,9 +88,9 @@ public class EmailService {
                     .header("Content-Type", "application/json")
                     .build();
 
-            var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.discarding());
+            var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400) {
-                // TODO throw special exception
+                throw new HttpResponseException("Error sending email request", response.statusCode(), response.body());
             }
         })
                 .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
