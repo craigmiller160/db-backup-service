@@ -18,18 +18,14 @@
 
 package io.craigmiller160.db.backup.email;
 
-import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-public class EmailService {
+@ExtendWith(MockitoExtension.class)
+public class EmailServiceTest {
 
-    private final PropertyStore propStore;
-
-    public EmailService(final PropertyStore propStore) {
-        this.propStore = propStore;
-    }
-
-    public void sendErrorAlertEmail(final String database, final String schema) {
-        // TODO finish this
+    public void test() {
+        throw new RuntimeException();
     }
 
 }
