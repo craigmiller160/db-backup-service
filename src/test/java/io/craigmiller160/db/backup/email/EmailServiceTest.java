@@ -27,7 +27,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.http.HttpClient;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
@@ -41,6 +44,7 @@ public class EmailServiceTest {
     private static final String DATABASE = "database";
     private static final String SCHEMA = "schema";
     private static final Exception EXCEPTION = new Exception("Dying");
+    private static final ZonedDateTime NOW = ZonedDateTime.of(2020, 1, 1, 1, 1, 1, 1, ZoneId.of("US/Eastern"));
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private PropertyStore propStore;
@@ -58,12 +62,23 @@ public class EmailServiceTest {
         properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, AUTH_EMAIL_CLIENT_KEY);
         properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
         propStore = new PropertyStore(properties);
-        emailService = new EmailService(propStore, () -> httpClient);
+        emailService = new TestEmailService(propStore, () -> httpClient);
     }
 
     @Test
     public void test_sendErrorAlertEmail() {
         emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
+    }
+
+    private static class TestEmailService extends EmailService {
+        public TestEmailService(final PropertyStore propStore, final Supplier<HttpClient> clientSupplier) {
+            super (propStore, clientSupplier);
+        }
+
+        @Override
+        protected ZonedDateTime getNowEastern() {
+            return NOW;
+        }
     }
 
 }

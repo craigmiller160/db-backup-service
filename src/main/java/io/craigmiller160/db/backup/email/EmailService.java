@@ -81,7 +81,7 @@ public class EmailService {
     public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
         getAccessToken()
                 .flatMap(accessToken -> {
-                    final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
+                    final var timestamp = getNowEastern().format(FORMATTER);
                     final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
                     final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
 
@@ -117,6 +117,10 @@ public class EmailService {
                 })
                 .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
                 .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
+    }
+
+    protected ZonedDateTime getNowEastern() {
+        return ZonedDateTime.now(ZoneId.of("US/Eastern"));
     }
 
     private Try<String> getAccessToken() {
