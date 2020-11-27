@@ -58,6 +58,7 @@ public class BackupSchedulerTest {
         final var properties = new Properties();
         properties.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
         properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "3000");
+        properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
         propStore = new PropertyStore(properties);
         backupConfig = new BackupConfig(List.of(
                 new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
