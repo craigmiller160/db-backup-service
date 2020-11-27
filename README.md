@@ -18,6 +18,8 @@ sudo apt install -y postgresql-client
 
 Use IntelliJ to run the `Runner.java` file.
 
+If the goal is to test the error alerts, the application `email-service` must be running locally as well.
+
 ## Deploying to Production
 
 First, an output directory needs to be configured on the local filesystem. The Kubernetes volume will point to `/opt/kubernetes/data/db-backup-service`, however that path should be symlinked so that it points to an external hard drive. That way the data is written to a place that will not be affected if the hard drive with the OS needs to be wiped/reinstalled.
