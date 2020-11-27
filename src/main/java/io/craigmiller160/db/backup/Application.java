@@ -19,10 +19,12 @@
 package io.craigmiller160.db.backup;
 
 import io.craigmiller160.db.backup.config.ConfigReader;
+import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.execution.BackupScheduler;
 import io.craigmiller160.db.backup.execution.TaskFactory;
 import io.craigmiller160.db.backup.properties.PropertyReader;
-import io.vavr.Tuple;
+import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,17 +38,31 @@ public class Application {
     private BackupScheduler backupScheduler;
 
     public void start() {
+        record StartContainer(
+                PropertyStore propStore,
+                ConfigReader configReader,
+                EmailService emailService,
+                BackupConfig backupConfig
+        ){}
+
         log.info("Starting application");
         new PropertyReader().readProperties()
-                .flatMap(propStore ->
-                        new ConfigReader(propStore).readBackupConfig()
-                                .map(config -> Tuple.of(propStore, config))
+                .map(propStore -> {
+                    final var configReader = new ConfigReader(propStore);
+                    final var emailService = new EmailService(propStore);
+                    return new StartContainer(propStore, configReader, emailService, null);
+                })
+                .flatMap(startContainer ->
+                        startContainer.configReader().readBackupConfig()
+                                .map(config -> new StartContainer(
+                                        startContainer.propStore(), startContainer.configReader(),
+                                        startContainer.emailService(), config
+                                ))
                 )
-                .onSuccess(tuple -> {
-
+                .onSuccess(startContainer -> {
                     log.info("Setting up scheduler");
                     synchronized (LOCK) {
-                        backupScheduler = new BackupScheduler(tuple._1, tuple._2, taskFactory);
+                        backupScheduler = new BackupScheduler(startContainer.propStore(), startContainer.backupConfig(), taskFactory);
                         backupScheduler.start();
                     }
                 })
