@@ -37,6 +37,10 @@ public class EmailServiceTest {
     private static final String AUTH_HOST = "https://localhost:7003";
     private static final String AUTH_EMAIL_CLIENT_KEY = "ABC";
     private static final String AUTH_EMAIL_CLIENT_SECRET = "DEF";
+    private static final String ACCESS_TOKEN = "accessToken";
+    private static final String DATABASE = "database";
+    private static final String SCHEMA = "schema";
+    private static final Exception EXCEPTION = new Exception("Dying");
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private PropertyStore propStore;
@@ -59,7 +63,7 @@ public class EmailServiceTest {
 
     @Test
     public void test_sendErrorAlertEmail() {
-        throw new RuntimeException();
+        emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
     }
 
 }
