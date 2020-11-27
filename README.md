@@ -18,7 +18,7 @@ sudo apt install -y postgresql-client
 
 Use IntelliJ to run the `Runner.java` file.
 
-If the goal is to test the error alerts, the application `email-service` must be running locally as well.
+If the goal is to test the error alerts, the applications `sso-oauth2-server` and `email-service` must be running locally as well.
 
 ## Deploying to Production
 
