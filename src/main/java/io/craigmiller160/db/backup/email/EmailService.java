@@ -18,7 +18,6 @@
 
 package io.craigmiller160.db.backup.email;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.craigmiller160.db.backup.exception.HttpResponseException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
@@ -68,24 +67,27 @@ public class EmailService {
     }
 
     public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
-        final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
-        final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
-        final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
-
-        final var emailRequest = new EmailRequest(
-                List.of(propStore.getEmailTo()),
-                Collections.emptyList(),
-                Collections.emptyList(),
-                ERROR_ALERT_SUBJECT,
-                emailText
-        );
-
         Try.run(() -> {
+            final var accessToken = getAccessToken(); // TODO probably want error handling here
+
+            final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
+            final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
+            final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
+
+            final var emailRequest = new EmailRequest(
+                    List.of(propStore.getEmailTo()),
+                    Collections.emptyList(),
+                    Collections.emptyList(),
+                    ERROR_ALERT_SUBJECT,
+                    emailText
+            );
+
             final var jsonBody = objectMapper.writeValueAsString(emailRequest);
             final var httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(String.format("%s%s", propStore.getEmailHost(), EMAIL_URI)))
                     .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                     .header("Content-Type", "application/json")
+                    .header("Authorization", String.format("Bearer %s", accessToken))
                     .build();
 
             var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -95,6 +97,11 @@ public class EmailService {
         })
                 .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
                 .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
+    }
+
+    public String getAccessToken() {
+        // TODO finish this
+        return null;
     }
 
 }
