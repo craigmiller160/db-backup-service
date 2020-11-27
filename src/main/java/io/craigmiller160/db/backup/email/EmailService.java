@@ -20,7 +20,22 @@ package io.craigmiller160.db.backup.email;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class EmailService {
+
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
+    private static final String ERROR_ALERT_MESSAGE = """
+            Database Backup Failed
+            
+            Database: %s
+            Schema: %s
+            Timestamp: %s
+            Error Message: %s
+            """;
 
     private final PropertyStore propStore;
 
@@ -28,8 +43,11 @@ public class EmailService {
         this.propStore = propStore;
     }
 
-    public void sendErrorAlertEmail(final String database, final String schema) {
-        // TODO finish this
+    public void sendErrorAlertEmail(final String database, final String schema, final String message) {
+        final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
+        final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, message);
+
+        // TODO send this
     }
 
 }
