@@ -10,3 +10,4 @@ data:
   config.file: backup_config_prod.json
   output.root-directory: /output
   executor.interval-secs: "3600"
+  email.host: https://email-service-service:8443
