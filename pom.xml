@@ -21,9 +21,15 @@
         <commons.io.version>2.8.0</commons.io.version>
         <commons.lang.verison>3.11</commons.lang.verison>
         <hamcrest.version>2.2</hamcrest.version>
+        <org.json.version>20201115</org.json.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${org.json.version}</version>
+        </dependency>
         <dependency>
             <groupId>io.craigmiller160</groupId>
             <artifactId>web-utils</artifactId>

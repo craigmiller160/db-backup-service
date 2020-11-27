@@ -23,6 +23,8 @@ import io.craigmiller160.db.backup.exception.HttpResponseException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.control.Try;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,8 +33,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -61,6 +63,9 @@ public class EmailService {
     private final PropertyStore propStore;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
+
+    private static final Object TOKEN_LOCK = new Object();
+    private String accessToken;
 
     public EmailService(final PropertyStore propStore) {
         this (propStore, () -> createHttpClient(propStore));
@@ -132,26 +137,45 @@ public class EmailService {
         return ZonedDateTime.now(ZoneId.of("US/Eastern"));
     }
 
+    private boolean isTokenExpired() {
+        final var tokenContentEncoded = accessToken.split("\\.")[1];
+        final var tokenContent = Base64.getDecoder().decode(tokenContentEncoded);
+        final var tokenObject = new JSONObject(tokenContent);
+        final var exp = tokenObject.getLong("exp");
+        final var expInstant = Instant.ofEpochSecond(exp);
+        final var expZdt = ZonedDateTime.ofInstant(expInstant, ZoneId.of("UTC"));
+        final var reuseTokenLimit = expZdt.minusSeconds(10);
+        return ZonedDateTime.now(ZoneId.of("UTC")).compareTo(reuseTokenLimit) > 0;
+    }
+
+    // TODO separate test for this
     private Try<String> getAccessToken() {
-        return Try.of(() -> {
-            final var rawBasicAuth = String.format("%s:%s", propStore.getEmailAuthClientKey(), propStore.getEmailAuthClientSecret());
-            final var encodedBasicAuth = Base64.getEncoder().encodeToString(rawBasicAuth.getBytes());
-            final var formBody = String.format("grant_type=password&username=%s&password=%s", propStore.getEmailAuthUser(), propStore.getEmailAuthPassword());
-            final var httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s%s", propStore.getEmailAuthHost(), TOKEN_URI)))
-                    .POST(HttpRequest.BodyPublishers.ofString(formBody))
-                    .header("Content-Type", "application/x-www-form-urlencoded")
-                    .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
-                    .build();
+        synchronized (TOKEN_LOCK) {
+            return Try.of(() -> {
+                if (StringUtils.isNotBlank(accessToken) && !isTokenExpired()) {
+                    return accessToken;
+                }
 
-            final var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 400) {
-                throw new HttpResponseException("Error getting access token", response.statusCode(), response.body());
-            }
+                final var rawBasicAuth = String.format("%s:%s", propStore.getEmailAuthClientKey(), propStore.getEmailAuthClientSecret());
+                final var encodedBasicAuth = Base64.getEncoder().encodeToString(rawBasicAuth.getBytes());
+                final var formBody = String.format("grant_type=password&username=%s&password=%s", propStore.getEmailAuthUser(), propStore.getEmailAuthPassword());
+                final var httpRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(String.format("%s%s", propStore.getEmailAuthHost(), TOKEN_URI)))
+                        .POST(HttpRequest.BodyPublishers.ofString(formBody))
+                        .header("Content-Type", "application/x-www-form-urlencoded")
+                        .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
+                        .build();
 
-            final var tokenResponse = objectMapper.readValue(response.body(), TokenResponse.class);
-            return tokenResponse.accessToken();
-        });
+                final var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() >= 400) {
+                    throw new HttpResponseException("Error getting access token", response.statusCode(), response.body());
+                }
+
+                final var tokenResponse = objectMapper.readValue(response.body(), TokenResponse.class);
+                return tokenResponse.accessToken();
+            });
+        }
+
     }
 
 }
