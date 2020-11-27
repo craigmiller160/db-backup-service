@@ -43,9 +43,10 @@ public class EmailService {
         this.propStore = propStore;
     }
 
-    public void sendErrorAlertEmail(final String database, final String schema, final String message) {
+    public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
         final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
-        final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, message);
+        final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
+        final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
 
         // TODO send this
     }
