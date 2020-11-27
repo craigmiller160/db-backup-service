@@ -20,6 +20,8 @@ package io.craigmiller160.db.backup.email;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,9 +40,15 @@ public class EmailService {
             """;
 
     private final PropertyStore propStore;
+    private final HttpClient httpClient;
 
     public EmailService(final PropertyStore propStore) {
         this.propStore = propStore;
+        httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofSeconds(propStore.getEmailConnectTimeoutSecs()))
+                .build();
     }
 
     public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
