@@ -14,5 +14,5 @@ data:
   email.auth.host: https://sso-oauth2-server-service:8443
   email.auth.client-key: 17795450-ff0d-47fe-b23c-dfe6d7f090d8
   email.auth.client-secret: c078af10-7f97-4afb-981d-76ecacb7dbfd
-  email.auth.client-user:
-  email.auth.client-password:
+  email.auth.client-user: dbBackupService@gmail.com
+  email.auth.client-password: db-backup-service-2020
