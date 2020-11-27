@@ -11,3 +11,8 @@ data:
   output.root-directory: /output
   executor.interval-secs: "3600"
   email.host: https://email-service-service:8443
+  email.auth.host: https://sso-oauth2-server-service:8443
+  email.auth.client-key: 17795450-ff0d-47fe-b23c-dfe6d7f090d8
+  email.auth.client-secret: c078af10-7f97-4afb-981d-76ecacb7dbfd
+  email.auth.client-user:
+  email.auth.client-password:
