@@ -42,6 +42,14 @@ public class PropertyStoreTest {
         props.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "1000");
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, System.getProperty("user.dir"));
         props.setProperty(PropertyStore.CONFIG_FILE, "backup_config.json");
+        props.setProperty(PropertyStore.EMAIL_HOST, "https://localhost:7100");
+        props.setProperty(PropertyStore.EMAIL_TO, "craig@gmail.com");
+        props.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "12");
+        props.setProperty(PropertyStore.EMAIL_AUTH_HOST, "https://localhost:7003");
+        props.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, "ABC");
+        props.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, "DEF");
+        props.setProperty(PropertyStore.EMAIL_AUTH_USER, "craig@gmail.com");
+        props.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, "password");
     }
 
     @Test
