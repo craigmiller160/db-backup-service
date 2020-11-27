@@ -32,6 +32,12 @@ import java.util.Properties;
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
 
+    private static final String EMAIL_TO = "craig@gmail.com";
+    private static final String EMAIL_HOST = "https://localhost:7100";
+    private static final String AUTH_HOST = "https://localhost:7003";
+    private static final String AUTH_EMAIL_CLIENT_KEY = "ABC";
+    private static final String AUTH_EMAIL_CLIENT_SECRET = "DEF";
+
     private final ObjectMapper objectMapper = new ObjectMapper();
     private PropertyStore propStore;
     @Mock
@@ -41,6 +47,12 @@ public class EmailServiceTest {
     @BeforeEach
     public void beforeEach() {
         final var properties = new Properties();
+        properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
+        properties.setProperty(PropertyStore.EMAIL_TO, EMAIL_TO);
+        properties.setProperty(PropertyStore.EMAIL_HOST, EMAIL_HOST);
+        properties.setProperty(PropertyStore.EMAIL_AUTH_HOST, AUTH_HOST);
+        properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, AUTH_EMAIL_CLIENT_KEY);
+        properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
         propStore = new PropertyStore(properties);
         emailService = new EmailService(propStore, () -> httpClient);
     }
