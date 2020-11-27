@@ -40,6 +40,7 @@ public class PropertyStore {
     public static final String EMAIL_HOST = "email.host";
     public static final String EMAIL_TO = "email.to";
     public static final String EMAIL_CONNECT_TIMEOUT_SECS = "email.connect-timeout-secs";
+    public static final String EMAIL_AUTH_HOST = "email.auth.host";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.ofEntries(
@@ -53,7 +54,8 @@ public class PropertyStore {
                     Tuple.of(CONFIG_FILE, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_HOST, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_TO, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(EMAIL_CONNECT_TIMEOUT_SECS, PropertyValidator.IS_NUMERIC)
+                    Tuple.of(EMAIL_CONNECT_TIMEOUT_SECS, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(EMAIL_AUTH_HOST, PropertyValidator.IS_NOT_BLANK)
             );
 
     private final Properties props;
@@ -118,6 +120,10 @@ public class PropertyStore {
 
     public int getEmailConnectTimeoutSecs() {
         return Integer.parseInt(props.getProperty(EMAIL_CONNECT_TIMEOUT_SECS));
+    }
+
+    public String getEmailAuthHost() {
+        return props.getProperty(EMAIL_AUTH_HOST);
     }
 
 }
