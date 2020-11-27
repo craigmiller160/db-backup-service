@@ -21,6 +21,7 @@ package io.craigmiller160.db.backup.email;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.craigmiller160.db.backup.exception.HttpResponseException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.Tuple;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
 
+    private static final String TOKEN_URI = "/oauth/token";
     private static final String EMAIL_URI = "/email";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
@@ -67,41 +70,66 @@ public class EmailService {
     }
 
     public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
-        Try.run(() -> {
-            final var accessToken = getAccessToken(); // TODO probably want error handling here
+        getAccessToken()
+                .flatMap(accessToken -> {
+                    final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
+                    final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
+                    final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
 
-            final var timestamp = ZonedDateTime.now(ZoneId.of("US/Eastern")).format(FORMATTER);
-            final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
-            final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
+                    final var emailRequest = new EmailRequest(
+                            List.of(propStore.getEmailTo()),
+                            Collections.emptyList(),
+                            Collections.emptyList(),
+                            ERROR_ALERT_SUBJECT,
+                            emailText
+                    );
 
-            final var emailRequest = new EmailRequest(
-                    List.of(propStore.getEmailTo()),
-                    Collections.emptyList(),
-                    Collections.emptyList(),
-                    ERROR_ALERT_SUBJECT,
-                    emailText
-            );
+                    return Try.of(() -> objectMapper.writeValueAsString(emailRequest))
+                            .map(jsonBody -> Tuple.of(accessToken, jsonBody));
+                })
+                .flatMap(tuple -> {
+                    final var accessToken = tuple._1;
+                    final var jsonBody = tuple._2;
 
-            final var jsonBody = objectMapper.writeValueAsString(emailRequest);
-            final var httpRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s%s", propStore.getEmailHost(), EMAIL_URI)))
-                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
-                    .header("Content-Type", "application/json")
-                    .header("Authorization", String.format("Bearer %s", accessToken))
-                    .build();
+                    final var httpRequest = HttpRequest.newBuilder()
+                            .uri(URI.create(String.format("%s%s", propStore.getEmailHost(), EMAIL_URI)))
+                            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                            .header("Content-Type", "application/json")
+                            .header("Authorization", String.format("Bearer %s", accessToken))
+                            .build();
 
-            var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 400) {
-                throw new HttpResponseException("Error sending email request", response.statusCode(), response.body());
-            }
-        })
+                    return Try.of(() -> httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()))
+                            .flatMap(response -> {
+                                if (response.statusCode() >= 400) {
+                                    return Try.failure(new HttpResponseException("Error sending email request", response.statusCode(), response.body()));
+                                }
+                                return Try.success("");
+                            });
+                })
                 .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
                 .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
     }
 
-    public String getAccessToken() {
-        // TODO finish this
-        return null;
+    private Try<String> getAccessToken() {
+        return Try.of(() -> {
+            final var rawBasicAuth = String.format("%s:%s", propStore.getEmailAuthClientKey(), propStore.getEmailAuthClientSecret());
+            final var encodedBasicAuth = Base64.getEncoder().encodeToString(rawBasicAuth.getBytes());
+            final var formBody = String.format("grant_type=password&username=%s&password=%s", propStore.getEmailAuthUser(), propStore.getEmailAuthPassword());
+            final var httpRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(String.format("%s%s", propStore.getEmailAuthHost(), TOKEN_URI)))
+                    .POST(HttpRequest.BodyPublishers.ofString(formBody))
+                    .header("Content-Type", "x-www-form-urlencoded")
+                    .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
+                    .build();
+
+            final var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 400) {
+                throw new HttpResponseException("Error getting access token", response.statusCode(), response.body());
+            }
+
+            final var tokenResponse = objectMapper.readValue(response.body(), TokenResponse.class);
+            return tokenResponse.accessToken();
+        });
     }
 
 }
