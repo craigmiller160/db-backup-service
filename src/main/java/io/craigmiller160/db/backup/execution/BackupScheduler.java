@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.control.Try;
@@ -37,13 +38,16 @@ public class BackupScheduler {
     private final BackupConfig backupConfig;
     private final ScheduledExecutorService executor;
     private final TaskFactory taskFactory;
+    private final EmailService emailService;
 
     public BackupScheduler(final PropertyStore propStore,
                            final BackupConfig backupConfig,
-                           final TaskFactory taskFactory) {
+                           final TaskFactory taskFactory,
+                           final EmailService emailService) {
         this.propStore = propStore;
         this.backupConfig = backupConfig;
         this.taskFactory = taskFactory;
+        this.emailService = emailService;
         this.executor = Executors.newScheduledThreadPool(propStore.getExecutorThreadCount());
     }
 
@@ -56,7 +60,7 @@ public class BackupScheduler {
                                 .stream()
                                 .map(schema -> Tuple.of(db.name(), schema))
                 )
-                .map(tuple -> taskFactory.createBackupTask(propStore, tuple._1, tuple._2))
+                .map(tuple -> taskFactory.createBackupTask(propStore, emailService, tuple._1, tuple._2))
                 .forEach(task -> executor.scheduleAtFixedRate(task, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS));
     }
 

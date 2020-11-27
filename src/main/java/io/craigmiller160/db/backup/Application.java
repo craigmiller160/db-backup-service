@@ -62,7 +62,10 @@ public class Application {
                 .onSuccess(startContainer -> {
                     log.info("Setting up scheduler");
                     synchronized (LOCK) {
-                        backupScheduler = new BackupScheduler(startContainer.propStore(), startContainer.backupConfig(), taskFactory);
+                        backupScheduler = new BackupScheduler(
+                                startContainer.propStore(), startContainer.backupConfig(),
+                                taskFactory, startContainer.emailService()
+                        );
                         backupScheduler.start();
                     }
                 })

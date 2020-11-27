@@ -18,6 +18,7 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
@@ -53,21 +54,25 @@ public class BackupTask implements Runnable {
     private final String database;
     private final String schema;
     private final ProcessProvider processProvider;
+    private final EmailService emailService;
 
     public BackupTask(final PropertyStore propStore,
                       final String database,
                       final String schema,
+                      final EmailService emailService,
                       final ProcessProvider processProvider) {
         this.propStore = propStore;
         this.database = database;
         this.schema = schema;
         this.processProvider = processProvider;
+        this.emailService = emailService;
     }
 
     public BackupTask(final PropertyStore propStore,
                       final String database,
-                      final String schema) {
-        this (propStore, database, schema, ProcessProvider.DEFAULT);
+                      final String schema,
+                      final EmailService emailService) {
+        this (propStore, database, schema, emailService, ProcessProvider.DEFAULT);
     }
 
     @Override

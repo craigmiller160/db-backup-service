@@ -18,6 +18,7 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
 import org.apache.commons.io.FileUtils;
@@ -57,6 +58,8 @@ public class BackupTaskTest {
     private BackupTask backupTask;
     @Mock
     private Process process;
+    @Mock
+    private EmailService emailService;
     private TestProcessProvider testProcessProvider;
 
     @BeforeEach
@@ -72,7 +75,7 @@ public class BackupTaskTest {
 
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
-        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, testProcessProvider);
+        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, emailService, testProcessProvider);
     }
 
     @Test
