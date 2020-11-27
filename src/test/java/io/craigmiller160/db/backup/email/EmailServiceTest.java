@@ -18,13 +18,35 @@
 
 package io.craigmiller160.db.backup.email;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.net.http.HttpClient;
+import java.util.Properties;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
 
-    public void test() {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private PropertyStore propStore;
+    @Mock
+    private HttpClient httpClient;
+    private EmailService emailService;
+
+    @BeforeEach
+    public void beforeEach() {
+        final var properties = new Properties();
+        propStore = new PropertyStore(properties);
+        emailService = new EmailService(propStore, () -> httpClient);
+    }
+
+    @Test
+    public void test_sendErrorAlertEmail() {
         throw new RuntimeException();
     }
 

@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class EmailService {
 
@@ -60,9 +61,17 @@ public class EmailService {
     private final ObjectMapper objectMapper;
 
     public EmailService(final PropertyStore propStore) {
+        this (propStore, () -> createHttpClient(propStore));
+    }
+
+    public EmailService(final PropertyStore propStore, final Supplier<HttpClient> clientSupplier) {
         this.propStore = propStore;
         this.objectMapper = new ObjectMapper();
-        httpClient = HttpClient.newBuilder()
+        this.httpClient = createHttpClient(propStore);
+    }
+
+    private static HttpClient createHttpClient(final PropertyStore propStore) {
+        return HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(propStore.getEmailConnectTimeoutSecs()))
