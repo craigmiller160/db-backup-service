@@ -36,6 +36,8 @@ public class PropertyStore {
     public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
+    public static final String EMAIL_HOST = "email.host";
+    public static final String EMAIL_TO = "email.to";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.of(
@@ -46,7 +48,9 @@ public class PropertyStore {
                     EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC,
                     EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC,
                     OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK,
-                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK
+                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK,
+                    EMAIL_HOST, PropertyValidator.IS_NOT_BLANK,
+                    EMAIL_TO, PropertyValidator.IS_NOT_BLANK
             );
 
     private final Properties props;
@@ -99,6 +103,14 @@ public class PropertyStore {
 
     public String getConfigFile() {
         return props.getProperty(CONFIG_FILE);
+    }
+
+    public String getEmailHost() {
+        return props.getProperty(EMAIL_HOST);
+    }
+
+    public String getEmailTo() {
+        return props.getProperty(EMAIL_TO);
     }
 
 }
