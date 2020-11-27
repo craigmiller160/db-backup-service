@@ -118,6 +118,11 @@ public class BackupTaskTest {
         assertEquals(DATA_CONTENT, fileContent);
     }
 
+    @Test
+    public void test_run_error() {
+        throw new RuntimeException();
+    }
+
     private static class TestProcessProvider implements ProcessProvider {
         private String[] command = null;
         private Map<String,String> environment = null;
