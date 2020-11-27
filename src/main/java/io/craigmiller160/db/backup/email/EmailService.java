@@ -26,10 +26,12 @@ import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -71,11 +73,18 @@ public class EmailService {
     }
 
     private static HttpClient createHttpClient(final PropertyStore propStore) {
-        return HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .followRedirects(HttpClient.Redirect.NORMAL)
-                .connectTimeout(Duration.ofSeconds(propStore.getEmailConnectTimeoutSecs()))
-                .build();
+        return Try.of(() -> {
+            System.setProperty("jdk.internal.httpclient.disableHostnameVerification", Boolean.TRUE.toString());
+            final var sslContext = SSLContext.getDefault();
+            return HttpClient.newBuilder()
+                    .version(HttpClient.Version.HTTP_1_1)
+                    .followRedirects(HttpClient.Redirect.NORMAL)
+                    .connectTimeout(Duration.ofSeconds(propStore.getEmailConnectTimeoutSecs()))
+                    .sslContext(sslContext)
+                    .build();
+        })
+                .recoverWith(ex -> Try.failure(new RuntimeException("Error creating HttpClient", ex)))
+                .get();
     }
 
     public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
@@ -131,7 +140,7 @@ public class EmailService {
             final var httpRequest = HttpRequest.newBuilder()
                     .uri(URI.create(String.format("%s%s", propStore.getEmailAuthHost(), TOKEN_URI)))
                     .POST(HttpRequest.BodyPublishers.ofString(formBody))
-                    .header("Content-Type", "x-www-form-urlencoded")
+                    .header("Content-Type", "application/x-www-form-urlencoded")
                     .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
                     .build();
 
