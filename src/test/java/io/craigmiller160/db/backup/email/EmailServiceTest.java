@@ -20,17 +20,28 @@ package io.craigmiller160.db.backup.email;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.apache.commons.lang3.NotImplementedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import javax.net.ssl.SSLSession;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Supplier;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class EmailServiceTest {
@@ -66,8 +77,14 @@ public class EmailServiceTest {
     }
 
     @Test
-    public void test_sendErrorAlertEmail() {
+    public void test_sendErrorAlertEmail() throws Exception {
         emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
+
+        final var tokenResponseDto = new TokenResponse(ACCESS_TOKEN, "", "");
+        final var tokenResponse = new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
+
+        when(httpClient.send(any(), any()))
+                .thenReturn(tokenResponse);
     }
 
     private static class TestEmailService extends EmailService {
@@ -78,6 +95,57 @@ public class EmailServiceTest {
         @Override
         protected ZonedDateTime getNowEastern() {
             return NOW;
+        }
+    }
+
+    private static class TestHttpResponse implements HttpResponse<Object> {
+
+        private final int statusCode;
+        private final Object body;
+
+        public TestHttpResponse(final int statusCode, final Object body) {
+            this.statusCode = statusCode;
+            this.body = body;
+        }
+
+        @Override
+        public int statusCode() {
+            return statusCode;
+        }
+
+        @Override
+        public HttpRequest request() {
+            throw new NotImplementedException("Method not implemented");
+        }
+
+        @Override
+        public Optional<HttpResponse<Object>> previousResponse() {
+            throw new NotImplementedException("Method not implemented");
+        }
+
+        @Override
+        public HttpHeaders headers() {
+            throw new NotImplementedException("Method not implemented");
+        }
+
+        @Override
+        public Object body() {
+            return body;
+        }
+
+        @Override
+        public Optional<SSLSession> sslSession() {
+            throw new NotImplementedException("Method not implemented");
+        }
+
+        @Override
+        public URI uri() {
+            throw new NotImplementedException("Method not implemented");
+        }
+
+        @Override
+        public HttpClient.Version version() {
+            throw new NotImplementedException("Method not implemented");
         }
     }
 
