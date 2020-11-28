@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: db-backup-service
-          image: localhost:32000/db-backup-service:1.2.0
+          image: localhost:32000/db-backup-service:1.3.0-SNAPSHOT
           envFrom:
             - configMapRef:
                 name: db-backup-service-configmap
