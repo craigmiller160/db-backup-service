@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: db-backup-service
-          image: localhost:32000/db-backup-service:1.2.0-SNAPSHOT
+          image: localhost:32000/db-backup-service:1.2.0-SNAPSHOT.3
           envFrom:
             - configMapRef:
                 name: db-backup-service-configmap
@@ -27,7 +27,7 @@ spec:
                 - sh
                 - /output/liveness.sh
             initialDelaySeconds: 60
-            periodSeconds: 1800
+            periodSeconds: 300
       volumes:
         - name: db-backup-service-volume
           hostPath:

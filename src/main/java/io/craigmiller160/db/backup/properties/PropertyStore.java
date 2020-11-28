@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.properties;
 
 import io.craigmiller160.db.backup.exception.PropertyException;
+import io.vavr.Tuple;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Try;
@@ -36,17 +37,33 @@ public class PropertyStore {
     public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
     public static final String CONFIG_FILE = "config.file";
+    public static final String EMAIL_HOST = "email.host";
+    public static final String EMAIL_TO = "email.to";
+    public static final String EMAIL_CONNECT_TIMEOUT_SECS = "email.connect-timeout-secs";
+    public static final String EMAIL_AUTH_HOST = "email.auth.host";
+    public static final String EMAIL_AUTH_CLIENT_KEY = "email.auth.client-key";
+    public static final String EMAIL_AUTH_CLIENT_SECRET = "email.auth.client-secret";
+    public static final String EMAIL_AUTH_USER = "email.auth.user";
+    public static final String EMAIL_AUTH_PASSWORD = "email.auth.password";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
-            HashMap.of(
-                    DB_POSTGRES_HOST, PropertyValidator.IS_NOT_BLANK,
-                    DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC,
-                    DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK,
-                    DB_POSTGRES_PASSWORD, PropertyValidator.IS_NOT_BLANK,
-                    EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC,
-                    EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC,
-                    OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK,
-                    CONFIG_FILE, PropertyValidator.IS_NOT_BLANK
+            HashMap.ofEntries(
+                    Tuple.of(DB_POSTGRES_HOST, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_POSTGRES_PASSWORD, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(CONFIG_FILE, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_HOST, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_TO, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_CONNECT_TIMEOUT_SECS, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(EMAIL_AUTH_HOST, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_AUTH_CLIENT_KEY, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_AUTH_USER, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(EMAIL_AUTH_PASSWORD, PropertyValidator.IS_NOT_BLANK)
             );
 
     private final Properties props;
@@ -99,6 +116,38 @@ public class PropertyStore {
 
     public String getConfigFile() {
         return props.getProperty(CONFIG_FILE);
+    }
+
+    public String getEmailHost() {
+        return props.getProperty(EMAIL_HOST);
+    }
+
+    public String getEmailTo() {
+        return props.getProperty(EMAIL_TO);
+    }
+
+    public int getEmailConnectTimeoutSecs() {
+        return Integer.parseInt(props.getProperty(EMAIL_CONNECT_TIMEOUT_SECS));
+    }
+
+    public String getEmailAuthHost() {
+        return props.getProperty(EMAIL_AUTH_HOST);
+    }
+
+    public String getEmailAuthClientKey() {
+        return props.getProperty(EMAIL_AUTH_CLIENT_KEY);
+    }
+
+    public String getEmailAuthClientSecret() {
+        return props.getProperty(EMAIL_AUTH_CLIENT_SECRET);
+    }
+
+    public String getEmailAuthUser() {
+        return props.getProperty(EMAIL_AUTH_USER);
+    }
+
+    public String getEmailAuthPassword() {
+        return props.getProperty(EMAIL_AUTH_PASSWORD);
     }
 
 }

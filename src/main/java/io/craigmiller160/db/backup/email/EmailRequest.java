@@ -16,19 +16,16 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.craigmiller160.db.backup.execution;
+package io.craigmiller160.db.backup.email;
 
-import io.craigmiller160.db.backup.email.EmailService;
-import io.craigmiller160.db.backup.properties.PropertyStore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TaskFactory {
+import java.util.List;
 
-    public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
-        return new BackupTask(propStore, database, schema, emailService);
-    }
-
-    public Runnable createLivenessCheckTask(final PropertyStore propStore) {
-        return new LivenessCheckTask(propStore);
-    }
-
-}
+public record EmailRequest (
+        @JsonProperty("toAddresses") List<String> toAddresses,
+        @JsonProperty("ccAddresses") List<String> ccAddresses,
+        @JsonProperty("bccAddresses") List<String> bccAddresses,
+        @JsonProperty("subject") String subject,
+        @JsonProperty("text") String text
+) { }

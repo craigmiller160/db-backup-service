@@ -18,6 +18,7 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
 import org.apache.commons.io.FileUtils;
@@ -25,6 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -37,8 +39,13 @@ import java.util.Map;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +64,8 @@ public class BackupTaskTest {
     private BackupTask backupTask;
     @Mock
     private Process process;
+    @Mock
+    private EmailService emailService;
     private TestProcessProvider testProcessProvider;
 
     @BeforeEach
@@ -72,7 +81,7 @@ public class BackupTaskTest {
 
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
-        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, testProcessProvider);
+        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, emailService, testProcessProvider);
     }
 
     @Test
@@ -113,6 +122,48 @@ public class BackupTaskTest {
 
         final var fileContent = IOUtils.toString(new FileInputStream(files[0]), StandardCharsets.UTF_8);
         assertEquals(DATA_CONTENT, fileContent);
+
+        verify(emailService, times(0))
+                .sendErrorAlertEmail(any(), any(), any());
+    }
+
+    @Test
+    public void test_run_error() {
+        when(process.getInputStream())
+                .thenThrow(new RuntimeException("Dying"));
+
+        backupTask.run();
+        final var expectedCommand = new String[] {
+                BackupTask.PG_DUMP_CMD,
+                DB_NAME,
+                BackupTask.SCHEMA_ARG,
+                SCHEMA_NAME,
+                BackupTask.HOST_ARG,
+                HOST,
+                BackupTask.PORT_ARG,
+                PORT,
+                BackupTask.USER_ARG,
+                USER,
+                BackupTask.USE_INSERT_STATEMENTS
+        };
+        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));
+
+        assertTrue(testProcessProvider.getEnvironment().isDefined());
+        assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
+
+        assertFalse(new File(OUTPUT_ROOT).exists());
+
+        final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
+        verify(emailService, times(1))
+                .sendErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
+
+        final var exception = exceptionCaptor.getValue();
+        assertNotNull(exception);
+        assertTrue(exception instanceof RuntimeException);
+        assertEquals("Dying", exception.getMessage());
     }
 
     private static class TestProcessProvider implements ProcessProvider {

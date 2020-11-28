@@ -18,6 +18,7 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
@@ -53,21 +54,25 @@ public class BackupTask implements Runnable {
     private final String database;
     private final String schema;
     private final ProcessProvider processProvider;
+    private final EmailService emailService;
 
     public BackupTask(final PropertyStore propStore,
                       final String database,
                       final String schema,
+                      final EmailService emailService,
                       final ProcessProvider processProvider) {
         this.propStore = propStore;
         this.database = database;
         this.schema = schema;
         this.processProvider = processProvider;
+        this.emailService = emailService;
     }
 
     public BackupTask(final PropertyStore propStore,
                       final String database,
-                      final String schema) {
-        this (propStore, database, schema, ProcessProvider.DEFAULT);
+                      final String schema,
+                      final EmailService emailService) {
+        this (propStore, database, schema, emailService, ProcessProvider.DEFAULT);
     }
 
     @Override
@@ -92,7 +97,10 @@ public class BackupTask implements Runnable {
                 .flatMap(this::readOutput)
                 .flatMap(this::writeToFile)
                 .onSuccess(filePath -> log.info("Successfully wrote backup for Database {} and Schema {} to File {}", database, schema, filePath))
-                .onFailure(ex -> log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex));
+                .onFailure(ex -> {
+                    log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex);
+                    emailService.sendErrorAlertEmail(database, schema, ex);
+                });
     }
 
     private Try<String> readOutput(final Process process) {

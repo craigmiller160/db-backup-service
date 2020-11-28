@@ -20,6 +20,7 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
+import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
@@ -48,6 +49,7 @@ public class BackupSchedulerTest {
 
     private PropertyStore propStore;
     private BackupConfig backupConfig;
+    private EmailService emailService;
     private TestTaskFactory backupTaskFactory;
     private BackupScheduler backupScheduler;
 
@@ -56,13 +58,15 @@ public class BackupSchedulerTest {
         final var properties = new Properties();
         properties.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
         properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "3000");
+        properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
         propStore = new PropertyStore(properties);
         backupConfig = new BackupConfig(List.of(
                 new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
                 new DatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
         ));
+        emailService = new EmailService(propStore);
         backupTaskFactory = new TestTaskFactory();
-        backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory);
+        backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory, emailService);
     }
 
     @AfterEach
@@ -92,7 +96,7 @@ public class BackupSchedulerTest {
         private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
 
         @Override
-        public Runnable createBackupTask(final PropertyStore propStore, final String database, final String schema) {
+        public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
             return () -> {
                 backupTaskProps.add(Tuple.of(database, schema));
             };

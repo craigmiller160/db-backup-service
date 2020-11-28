@@ -16,19 +16,12 @@
  *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.craigmiller160.db.backup.execution;
+package io.craigmiller160.db.backup.exception;
 
-import io.craigmiller160.db.backup.email.EmailService;
-import io.craigmiller160.db.backup.properties.PropertyStore;
+public class HttpResponseException extends Exception {
 
-public class TaskFactory {
-
-    public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
-        return new BackupTask(propStore, database, schema, emailService);
-    }
-
-    public Runnable createLivenessCheckTask(final PropertyStore propStore) {
-        return new LivenessCheckTask(propStore);
+    public HttpResponseException(final String message, final int status, final String body) {
+        super (String.format("%s: Status: %d, Body: %s", message, status, body));
     }
 
 }
