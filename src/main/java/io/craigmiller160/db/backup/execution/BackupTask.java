@@ -104,10 +104,6 @@ public class BackupTask implements Runnable {
     }
 
     private Try<String> readOutput(final Process process) {
-        if (true) {
-            throw new RuntimeException("Dying"); // TODO delete this
-        }
-
         return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getInputStream())))
                 .of(reader -> reader.lines().collect(Collectors.joining("\n")));
     }
