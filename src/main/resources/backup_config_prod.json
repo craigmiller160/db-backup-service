@@ -18,6 +18,24 @@
         "dev",
         "prod"
       ]
+    },
+    {
+      "name": "funcoast_hi_dev",
+      "schemas": [
+        "public"
+      ]
+    },
+    {
+      "name": "funcoast_hi_test",
+      "schemas": [
+        "public"
+      ]
+    },
+    {
+      "name": "funcoast_hi_prod",
+      "schemas": [
+        "public"
+      ]
     }
   ]
 }
