@@ -30,6 +30,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Properties;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CleanupTaskTest {
 
@@ -78,12 +81,13 @@ public class CleanupTaskTest {
         Files.createFile(Path.of(outputPath.toString(), file1));
         Files.createFile(Path.of(outputPath.toString(), file2));
         Files.createFile(Path.of(outputPath.toString(), file3));
-        throw new RuntimeException();
-    }
 
-    @Test
-    public void test_run_noDirectory() throws Exception {
-        throw new RuntimeException();
+        cleanupTask.run();
+
+        final var remainingFiles = Files.list(outputPath)
+                .collect(Collectors.toList());
+        assertEquals(1, remainingFiles.size());
+        assertEquals(file3, remainingFiles.get(0).getFileName().toString());
     }
 
 }
