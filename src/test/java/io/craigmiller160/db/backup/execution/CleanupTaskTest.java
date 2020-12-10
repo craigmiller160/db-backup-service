@@ -18,12 +18,54 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Properties;
 
 public class CleanupTaskTest {
 
+    private static final String DB_NAME = "DbName";
+    private static final String SCHEMA_NAME = "SchemaName";
+    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
+
+    private PropertyStore propStore;
+    private CleanupTask cleanupTask;
+    private Path outputPath;
+
+    @BeforeEach
+    public void beforeEach() throws Exception {
+        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+
+        final var props = new Properties();
+        props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+        propStore = new PropertyStore(props);
+
+        outputPath = Paths.get(OUTPUT_ROOT, DB_NAME, SCHEMA_NAME);
+
+        cleanupTask = new CleanupTask(propStore, DB_NAME, SCHEMA_NAME);
+    }
+
+    @AfterEach
+    public void afterEach() throws Exception {
+        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+    }
+
     @Test
-    public void test_run() {
+    public void test_run() throws Exception {
+        Files.createDirectories(outputPath);
+        throw new RuntimeException();
+    }
+
+    @Test
+    public void test_run_noDirectory() throws Exception {
         throw new RuntimeException();
     }
 
