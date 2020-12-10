@@ -60,34 +60,36 @@ public class CleanupTask implements Runnable {
         final var oldestAllowed = ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
                 .minusDays(propStore.getOutputCleanupAgeDays());
 
-        Try.of(() -> {
-            return Stream.ofAll(Files.list(schemaOutputDir))
-                    .map(path -> path.getFileName().toString())
-                    .filter(path -> {
-                        final var timestampString = path.replace("backup_", "").replace(".sql", "");
-                        final var timestamp = LocalDateTime.parse(timestampString, BackupConstants.FORMAT).atZone(ZoneId.of(BackupConstants.TIME_ZONE));
+        Try.of(() ->
+                Stream.ofAll(Files.list(schemaOutputDir))
+                        .filter(path -> {
+                            final var fileName = path.getFileName().toString();
+                            final var timestampString = fileName.replace("backup_", "").replace(".sql", "");
+                            final var timestamp = LocalDateTime.parse(timestampString, BackupConstants.FORMAT).atZone(ZoneId.of(BackupConstants.TIME_ZONE));
 
-                        return oldestAllowed.compareTo(timestamp) > 0;
-                    })
-                    .toList();
-        })
-                .onSuccess(filesToDelete -> {
-                    filesToDelete.forEach(fileName -> {
-                        Try.run(() -> {
-                            final var fullPath = Path.of(schemaOutputDir.toString(), fileName);
-                            Files.delete(fullPath);
+                            return oldestAllowed.compareTo(timestamp) > 0;
                         })
-                                .onFailure(ex -> log.error(String.format("Error deleting file")));
-                    });
-                })
+                        .foldLeft(new CleanupResult(0, 0), (result, path) ->
+                            Try.of(() -> {
+                                Files.delete(path);
+                                return path;
+                            })
+                                    .map(p -> new CleanupResult(result.successCount() + 1, result.failureCount()))
+                                    .recoverWith(ex -> {
+                                        log.debug(String.format("Failed to cleanup file %s for Database %s and Schema %s", path, database, schema), ex);
+                                        return Try.success(new CleanupResult(result.successCount(), result.failureCount() + 1));
+                                    })
+                                    .get()
+                        )
+        )
+                .onSuccess(result -> log.info("Finished cleaning up Database {} and Schema {}. Success: {} Failure: {}", database, schema, result.successCount(), result.failureCount()))
+                .onFailure(ex -> log.error(String.format("Error attempting to cleanup Database {} and Schema {}", database, schema), ex));
+    }
 
-
-//        filesToDelete.forEach(fileName -> {
-//            final var fullPath = Path.of(schemaOutputDir.toString(), fileName);
-//            Files.delete(fullPath);
-//        });
-//
-//        log.info("Cleaned up {} files for Database {} and Schema {}", filesToDelete.size(), database, schema);
+    public static record CleanupResult(int successCount, int failureCount) {
+        public int totalCount() {
+            return successCount + failureCount;
+        }
     }
 
 }
