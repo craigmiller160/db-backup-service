@@ -22,6 +22,10 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 public class CleanupTask implements Runnable {
 
     private static final Logger log = LoggerFactory.getLogger(CleanupTask.class);
@@ -41,7 +45,14 @@ public class CleanupTask implements Runnable {
     @Override
     public void run() {
         log.info("Running cleanup for Database {} and Schema {}", database, schema);
-        // TODO finish this
+
+        final var schemaOutputDir = Paths.get(propStore.getOutputRootDirectory(), database, schema);
+        if (!Files.exists(schemaOutputDir)) {
+            log.info("Directory to cleanup does not exist: {}", schemaOutputDir.toAbsolutePath().toString());
+            return;
+        }
+
+        Files.list(schemaOutputDir)
     }
 
 }
