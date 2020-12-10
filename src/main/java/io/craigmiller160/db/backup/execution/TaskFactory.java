@@ -31,4 +31,8 @@ public class TaskFactory {
         return new LivenessCheckTask(propStore);
     }
 
+    public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
+        return new CleanupTask(propStore, database, schema);
+    }
+
 }
