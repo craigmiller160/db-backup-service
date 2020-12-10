@@ -65,11 +65,11 @@ public class BackupScheduler {
                     final var cleanupTask = taskFactory.createCleanupTask(propStore, tuple._1, tuple._2);
                     return Tuple.of(backupTask, cleanupTask);
                 })
-                .forEach(taskTuple -> { // TODO update tests
+                .forEach(taskTuple -> {
                     final var backupTask = taskTuple._1;
                     final var cleanupTask = taskTuple._2;
                     executor.scheduleAtFixedRate(backupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
-                    executor.scheduleAtFixedRate(cleanupTask, propStore.getExecutorIntervalSecs(), propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+                    executor.scheduleAtFixedRate(cleanupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
                 });
     }
 
