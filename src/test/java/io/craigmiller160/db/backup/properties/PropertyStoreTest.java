@@ -50,6 +50,7 @@ public class PropertyStoreTest {
         props.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, "DEF");
         props.setProperty(PropertyStore.EMAIL_AUTH_USER, "craig@gmail.com");
         props.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, "password");
+        props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "30");
     }
 
     @Test
