@@ -60,8 +60,17 @@ public class BackupScheduler {
                                 .stream()
                                 .map(schema -> Tuple.of(db.name(), schema))
                 )
-                .map(tuple -> taskFactory.createBackupTask(propStore, emailService, tuple._1, tuple._2))
-                .forEach(task -> executor.scheduleAtFixedRate(task, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS));
+                .map(tuple -> {
+                    final var backupTask = taskFactory.createBackupTask(propStore, emailService, tuple._1, tuple._2);
+                    final var cleanupTask = taskFactory.createCleanupTask(propStore, tuple._1, tuple._2);
+                    return Tuple.of(backupTask, cleanupTask);
+                })
+                .forEach(taskTuple -> { // TODO update tests
+                    final var backupTask = taskTuple._1;
+                    final var cleanupTask = taskTuple._2;
+                    executor.scheduleAtFixedRate(backupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+                    executor.scheduleAtFixedRate(cleanupTask, propStore.getExecutorIntervalSecs(), propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+                });
     }
 
     public boolean stop() {
