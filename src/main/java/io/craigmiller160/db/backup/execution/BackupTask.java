@@ -46,8 +46,6 @@ public class BackupTask implements Runnable {
     public static final String USE_INSERT_STATEMENTS = "--column-inserts";
 
     private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
-    private static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-    private static final String TIME_ZONE = "US/Eastern";
     public static final String PASSWORD_ENV = "PGPASSWORD";
 
     private final PropertyStore propStore;
@@ -117,7 +115,7 @@ public class BackupTask implements Runnable {
             return Try.failure(new BackupException(String.format("Unable to create output directory: %s", schemaOutputDir.getAbsolutePath())));
         }
 
-        final var timestamp = FORMAT.format(ZonedDateTime.now(ZoneId.of(TIME_ZONE)));
+        final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
         final var outputFile = new File(schemaOutputDir, String.format("backup_%s.sql", timestamp));
 
         return Try.withResources(() -> new FileWriter(outputFile))

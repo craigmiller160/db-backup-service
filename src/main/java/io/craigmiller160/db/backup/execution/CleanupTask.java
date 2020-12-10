@@ -19,13 +19,17 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.collection.Stream;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class CleanupTask implements Runnable {
 
@@ -53,12 +57,37 @@ public class CleanupTask implements Runnable {
             return;
         }
 
-        try {
-            Files.list(schemaOutputDir)
-                    .forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        final var oldestAllowed = ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
+                .minusDays(propStore.getOutputCleanupAgeDays());
+
+        Try.of(() -> {
+            return Stream.ofAll(Files.list(schemaOutputDir))
+                    .map(path -> path.getFileName().toString())
+                    .filter(path -> {
+                        final var timestampString = path.replace("backup_", "").replace(".sql", "");
+                        final var timestamp = LocalDateTime.parse(timestampString, BackupConstants.FORMAT).atZone(ZoneId.of(BackupConstants.TIME_ZONE));
+
+                        return oldestAllowed.compareTo(timestamp) > 0;
+                    })
+                    .toList();
+        })
+                .onSuccess(filesToDelete -> {
+                    filesToDelete.forEach(fileName -> {
+                        Try.run(() -> {
+                            final var fullPath = Path.of(schemaOutputDir.toString(), fileName);
+                            Files.delete(fullPath);
+                        })
+                                .onFailure(ex -> log.error(String.format("Error deleting file")));
+                    });
+                })
+
+
+//        filesToDelete.forEach(fileName -> {
+//            final var fullPath = Path.of(schemaOutputDir.toString(), fileName);
+//            Files.delete(fullPath);
+//        });
+//
+//        log.info("Cleaned up {} files for Database {} and Schema {}", filesToDelete.size(), database, schema);
     }
 
 }
