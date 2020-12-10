@@ -28,6 +28,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 public class CleanupTaskTest {
@@ -39,6 +40,9 @@ public class CleanupTaskTest {
     private PropertyStore propStore;
     private CleanupTask cleanupTask;
     private Path outputPath;
+    private String file1;
+    private String file2;
+    private String file3;
 
     @BeforeEach
     public void beforeEach() throws Exception {
@@ -46,9 +50,19 @@ public class CleanupTaskTest {
 
         final var props = new Properties();
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+        props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "10");
         propStore = new PropertyStore(props);
 
         outputPath = Paths.get(OUTPUT_ROOT, DB_NAME, SCHEMA_NAME);
+
+        final var time1 = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
+        final var time2 = LocalDateTime.of(2020, 1, 2, 0, 0, 0);
+        final var time3 = LocalDateTime.now();
+        file1 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time1));
+        file2 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time2));
+        file3 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time3));
+
+
 
         cleanupTask = new CleanupTask(propStore, DB_NAME, SCHEMA_NAME);
     }
@@ -61,6 +75,9 @@ public class CleanupTaskTest {
     @Test
     public void test_run() throws Exception {
         Files.createDirectories(outputPath);
+        Files.createFile(Path.of(outputPath.toString(), file1));
+        Files.createFile(Path.of(outputPath.toString(), file2));
+        Files.createFile(Path.of(outputPath.toString(), file3));
         throw new RuntimeException();
     }
 
