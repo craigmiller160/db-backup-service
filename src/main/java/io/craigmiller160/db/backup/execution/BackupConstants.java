@@ -18,21 +18,13 @@
 
 package io.craigmiller160.db.backup.execution;
 
-import io.craigmiller160.db.backup.email.EmailService;
-import io.craigmiller160.db.backup.properties.PropertyStore;
+import java.time.format.DateTimeFormatter;
 
-public class TaskFactory {
+public class BackupConstants {
 
-    public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
-        return new BackupTask(propStore, database, schema, emailService);
-    }
+    public static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    public static final String TIME_ZONE = "US/Eastern";
 
-    public Runnable createLivenessCheckTask(final PropertyStore propStore) {
-        return new LivenessCheckTask(propStore);
-    }
-
-    public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
-        return new CleanupTask(propStore, database, schema);
-    }
+    private BackupConstants() {}
 
 }

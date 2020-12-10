@@ -57,7 +57,7 @@ public class BackupSchedulerTest {
     public void setup() {
         final var properties = new Properties();
         properties.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
-        properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "3000");
+        properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "300000");
         properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
         propStore = new PropertyStore(properties);
         backupConfig = new BackupConfig(List.of(
@@ -87,12 +87,20 @@ public class BackupSchedulerTest {
         assertEquals(Tuple.of(DB_NAME, SCHEMA_2), backupTaskProps.get(1));
         assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), backupTaskProps.get(2));
 
+        final var cleanupTaskProps = backupTaskFactory.getCleanupTaskProps();
+        assertEquals(3, cleanupTaskProps.size());
+        backupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), cleanupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), cleanupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), cleanupTaskProps.get(2));
+
         final var livenessCheckPropStore = backupTaskFactory.getLivenessCheckPropStore();
         assertTrue(livenessCheckPropStore.isDefined());
     }
 
     private static class TestTaskFactory extends TaskFactory {
         private final List<Tuple2<String,String>> backupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> cleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
         private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
 
         @Override
@@ -109,12 +117,23 @@ public class BackupSchedulerTest {
             };
         }
 
+        @Override
+        public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
+            return () -> {
+                cleanupTaskProps.add(Tuple.of(database, schema));
+            };
+        }
+
         public List<Tuple2<String,String>> getBackupTaskProps() {
             return new ArrayList<>(backupTaskProps);
         }
 
         public Option<PropertyStore> getLivenessCheckPropStore() {
             return Option.of(livenessCheckPropStore.get());
+        }
+
+        public List<Tuple2<String,String>> getCleanupTaskProps() {
+            return new ArrayList<>(cleanupTaskProps);
         }
     }
 
