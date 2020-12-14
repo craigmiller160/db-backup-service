@@ -1,41 +1,50 @@
 {
-  "databases": [
-    {
-      "name": "vm_dev",
-      "schemas": [
-        "public"
-      ]
-    },
-    {
-      "name": "vm_prod",
-      "schemas": [
-        "public"
-      ]
-    },
-    {
-      "name": "oauth2_server",
-      "schemas": [
-        "dev",
-        "prod"
-      ]
-    },
-    {
-      "name": "funcoast_hi_dev",
-      "schemas": [
-        "public"
-      ]
-    },
-    {
-      "name": "funcoast_hi_test",
-      "schemas": [
-        "public"
-      ]
-    },
-    {
-      "name": "funcoast_hi_prod",
-      "schemas": [
-        "public"
-      ]
-    }
-  ]
+  "postgres": {
+    "databases": [
+      {
+        "name": "vm_dev",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "vm_prod",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "oauth2_server",
+        "schemas": [
+          "dev",
+          "prod"
+        ]
+      },
+      {
+        "name": "funcoast_hi_dev",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "funcoast_hi_test",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "funcoast_hi_prod",
+        "schemas": [
+          "public"
+        ]
+      }
+    ]
+  },
+  "mongodb": {
+    "databases": [
+      {
+        "name": "covid_19_prod"
+      }
+    ]
+  }
 }
