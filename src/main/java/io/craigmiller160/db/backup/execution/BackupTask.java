@@ -29,10 +29,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -72,6 +70,8 @@ public class BackupTask implements Runnable {
                       final EmailService emailService) {
         this (propStore, database, schema, emailService, ProcessProvider.DEFAULT);
     }
+
+    // TODO update tests for error code
 
     @Override
     public void run() {
