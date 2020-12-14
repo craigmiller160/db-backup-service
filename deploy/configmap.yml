@@ -5,8 +5,7 @@ metadata:
 data:
   db.postgres.host: postgres-service
   db.postgres.port: "5432"
-  db.postgres.user: user
-  db.postgres.password: password
+  db.postgres.user: postgres_root
   config.file: backup_config_prod.json
   output.root-directory: /output
   output.cleanup.age-days: "30"
