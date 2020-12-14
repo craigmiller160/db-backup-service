@@ -29,3 +29,13 @@ Now, fully build the application with `mvn clean package`. Then, run `kube-deplo
 ## Adding Databases/Schemas to Backup
 
 There is a file, `backup_config_prod.json`, in the root of the resources directory. Update this with the database/schema names and re-release to include it in the backup.
+
+## How To Restore Backup
+
+1. Delete the existing schema, if it still exists.
+1. If the database doesn't exist (ie, DB wipe), create it.
+1. Run this command:
+
+```
+psql -h localhost -p 30001 -U postgres_root oauth2_server < backup_20201213171523.sql
+```
