@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.email.EmailService;
+import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
 import org.apache.commons.io.FileUtils;
@@ -88,6 +89,8 @@ public class BackupTaskTest {
     public void test_run() throws Exception {
         when(process.getInputStream())
                 .thenReturn(IOUtils.toInputStream(DATA_CONTENT, StandardCharsets.UTF_8));
+        when(process.exitValue())
+                .thenReturn(0);
 
         backupTask.run();
         final var expectedCommand = new String[] {
@@ -128,9 +131,49 @@ public class BackupTaskTest {
     }
 
     @Test
+    public void test_run_processError() {
+        when(process.getInputStream())
+                .thenReturn(IOUtils.toInputStream("", StandardCharsets.UTF_8));
+        when(process.getErrorStream())
+                .thenReturn(IOUtils.toInputStream("Error Message", StandardCharsets.UTF_8));
+        when(process.exitValue())
+                .thenReturn(1);
+
+        backupTask.run();
+        final var expectedCommand = new String[] {
+                BackupTask.PG_DUMP_CMD,
+                DB_NAME,
+                BackupTask.SCHEMA_ARG,
+                SCHEMA_NAME,
+                BackupTask.HOST_ARG,
+                HOST,
+                BackupTask.PORT_ARG,
+                PORT,
+                BackupTask.USER_ARG,
+                USER,
+                BackupTask.USE_INSERT_STATEMENTS
+        };
+        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));
+
+        final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
+        verify(emailService, times(1))
+                .sendErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
+
+        final var exception = exceptionCaptor.getValue();
+        assertNotNull(exception);
+        assertTrue(exception instanceof BackupException);
+        assertEquals("Error Message", exception.getMessage());
+    }
+
+    @Test
     public void test_run_error() {
         when(process.getInputStream())
                 .thenThrow(new RuntimeException("Dying"));
+        when(process.exitValue())
+                .thenReturn(0);
 
         backupTask.run();
         final var expectedCommand = new String[] {

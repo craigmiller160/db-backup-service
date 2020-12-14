@@ -49,6 +49,10 @@ public class ConfigReaderTest {
                         new DatabaseConfig(
                                 "vm_dev",
                                 List.of("public")
+                        ),
+                        new DatabaseConfig(
+                                "fake",
+                                List.of("public")
                         )
                 )
         );
