@@ -34,6 +34,7 @@ There is a file, `backup_config_prod.json`, in the root of the resources directo
 
 1. Delete the existing schema, if it still exists.
 1. If the database doesn't exist (ie, DB wipe), create it.
+1. Identify the file to add. Make sure the ownership settings for it are good. (Optional)
 1. Run this command:
 
 ```
