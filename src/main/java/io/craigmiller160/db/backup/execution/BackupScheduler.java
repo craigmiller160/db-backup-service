@@ -52,6 +52,7 @@ public class BackupScheduler {
     }
 
     public void start() {
+        // TODO add MongoDB to this
         this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
         backupConfig.postgres().databases()
                 .stream()
