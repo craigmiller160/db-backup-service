@@ -21,6 +21,7 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.Tuple;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -92,7 +94,7 @@ public class BackupTask implements Runnable {
         };
         final var environment = Map.of(PASSWORD_ENV, propStore.getPostgresPassword());
         Try.of(() -> processProvider.provide(command, environment))
-                .flatMap(this::readOutput)
+                .flatMap(this::readProcess)
                 .flatMap(this::writeToFile)
                 .onSuccess(filePath -> log.info("Successfully wrote backup for Database {} and Schema {} to File {}", database, schema, filePath))
                 .onFailure(ex -> {
@@ -101,8 +103,27 @@ public class BackupTask implements Runnable {
                 });
     }
 
+    private Try<String> readProcess(final Process process) {
+        final var outputTry = readOutput(process);
+        final var errorTry = readError(process);
+
+        process.destroy();
+        final var exitCode = process.exitValue();
+
+        if (exitCode == 0) {
+            return outputTry;
+        }
+
+        return errorTry.flatMap(content -> Try.failure(new BackupException(content)));
+    }
+
     private Try<String> readOutput(final Process process) {
         return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getInputStream())))
+                .of(reader -> reader.lines().collect(Collectors.joining("\n")));
+    }
+
+    private Try<String> readError(final Process process) {
+        return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getErrorStream())))
                 .of(reader -> reader.lines().collect(Collectors.joining("\n")));
     }
 
