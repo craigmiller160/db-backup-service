@@ -5,6 +5,12 @@
       "schemas": [
         "public"
       ]
+    },
+    {
+      "name": "fake",
+      "schemas": [
+        "public"
+      ]
     }
   ]
 }
