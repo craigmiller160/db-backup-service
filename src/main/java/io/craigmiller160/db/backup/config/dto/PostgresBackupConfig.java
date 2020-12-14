@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record DatabaseConfig(
-        @JsonProperty("name") String name,
-        @JsonProperty("schemas") List<String> schemas
-) {}
+public record PostgresBackupConfig(
+        @JsonProperty("databases") List<PostgresDatabaseConfig> databases
+) { }

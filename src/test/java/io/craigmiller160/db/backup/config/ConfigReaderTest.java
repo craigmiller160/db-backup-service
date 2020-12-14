@@ -19,7 +19,7 @@
 package io.craigmiller160.db.backup.config;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
-import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,11 +46,11 @@ public class ConfigReaderTest {
     public void test_readBackupConfig() throws Exception {
         final var expected = new BackupConfig(
                 List.of(
-                        new DatabaseConfig(
+                        new PostgresDatabaseConfig(
                                 "vm_dev",
                                 List.of("public")
                         ),
-                        new DatabaseConfig(
+                        new PostgresDatabaseConfig(
                                 "fake",
                                 List.of("public")
                         )

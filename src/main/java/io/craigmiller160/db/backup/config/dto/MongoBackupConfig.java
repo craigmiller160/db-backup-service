@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public record BackupConfig(
-        @JsonProperty("postgres") PostgresBackupConfig postgres,
-        @JsonProperty("mongodb") MongoBackupConfig mongodb
-) {}
+public record MongoBackupConfig (
+        @JsonProperty("databases") List<MongoDatabaseConfig> databases
+) { }
