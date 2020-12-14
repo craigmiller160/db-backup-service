@@ -18,6 +18,12 @@ spec:
           envFrom:
             - configMapRef:
                 name: db-backup-service-configmap
+          env:
+            - name: db.postgres.password
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-root-password
+                  key: POSTGRES_ROOT_PASSWORD
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
