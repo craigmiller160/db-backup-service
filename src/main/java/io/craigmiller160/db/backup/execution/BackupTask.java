@@ -21,7 +21,6 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
-import io.vavr.Tuple;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,6 @@ import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -72,8 +70,6 @@ public class BackupTask implements Runnable {
                       final EmailService emailService) {
         this (propStore, database, schema, emailService, ProcessProvider.DEFAULT);
     }
-
-    // TODO update tests for error code
 
     @Override
     public void run() {
