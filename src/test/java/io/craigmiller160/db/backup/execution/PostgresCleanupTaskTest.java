@@ -34,14 +34,14 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CleanupTaskTest {
+public class PostgresCleanupTaskTest {
 
     private static final String DB_NAME = "DbName";
     private static final String SCHEMA_NAME = "SchemaName";
     private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
 
     private PropertyStore propStore;
-    private CleanupTask cleanupTask;
+    private PostgresCleanupTask postgresCleanupTask;
     private Path outputPath;
     private String file1;
     private String file2;
@@ -67,7 +67,7 @@ public class CleanupTaskTest {
 
 
 
-        cleanupTask = new CleanupTask(propStore, DB_NAME, SCHEMA_NAME);
+        postgresCleanupTask = new PostgresCleanupTask(propStore, DB_NAME, SCHEMA_NAME);
     }
 
     @AfterEach
@@ -82,7 +82,7 @@ public class CleanupTaskTest {
         Files.createFile(Path.of(outputPath.toString(), file2));
         Files.createFile(Path.of(outputPath.toString(), file3));
 
-        cleanupTask.run();
+        postgresCleanupTask.run();
 
         final var remainingFiles = Files.list(outputPath)
                 .collect(Collectors.toList());

@@ -34,7 +34,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BackupTask implements Runnable {
+public class PostgresBackupTask implements Runnable {
 
     public static final String PG_DUMP_CMD = "pg_dump";
     public static final String HOST_ARG = "-h";
@@ -43,7 +43,7 @@ public class BackupTask implements Runnable {
     public static final String USER_ARG = "-U";
     public static final String USE_INSERT_STATEMENTS = "--column-inserts";
 
-    private static final Logger log = LoggerFactory.getLogger(BackupTask.class);
+    private static final Logger log = LoggerFactory.getLogger(PostgresBackupTask.class);
     public static final String PASSWORD_ENV = "PGPASSWORD";
 
     private final PropertyStore propStore;
@@ -52,11 +52,11 @@ public class BackupTask implements Runnable {
     private final ProcessProvider processProvider;
     private final EmailService emailService;
 
-    public BackupTask(final PropertyStore propStore,
-                      final String database,
-                      final String schema,
-                      final EmailService emailService,
-                      final ProcessProvider processProvider) {
+    public PostgresBackupTask(final PropertyStore propStore,
+                              final String database,
+                              final String schema,
+                              final EmailService emailService,
+                              final ProcessProvider processProvider) {
         this.propStore = propStore;
         this.database = database;
         this.schema = schema;
@@ -64,10 +64,10 @@ public class BackupTask implements Runnable {
         this.emailService = emailService;
     }
 
-    public BackupTask(final PropertyStore propStore,
-                      final String database,
-                      final String schema,
-                      final EmailService emailService) {
+    public PostgresBackupTask(final PropertyStore propStore,
+                              final String database,
+                              final String schema,
+                              final EmailService emailService) {
         this (propStore, database, schema, emailService, ProcessProvider.DEFAULT);
     }
 

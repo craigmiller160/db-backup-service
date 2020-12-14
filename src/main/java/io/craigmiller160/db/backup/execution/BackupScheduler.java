@@ -53,7 +53,7 @@ public class BackupScheduler {
 
     public void start() {
         this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
-        backupConfig.databases()
+        backupConfig.postgres().databases()
                 .stream()
                 .flatMap(db ->
                         db.schemas()

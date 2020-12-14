@@ -50,7 +50,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BackupTaskTest {
+public class PostgresBackupTaskTest {
 
     private static final String DATA_CONTENT = "Success";
     private static final String DB_NAME = "DbName";
@@ -62,7 +62,7 @@ public class BackupTaskTest {
     private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
 
     private PropertyStore propStore;
-    private BackupTask backupTask;
+    private PostgresBackupTask postgresBackupTask;
     @Mock
     private Process process;
     @Mock
@@ -82,7 +82,7 @@ public class BackupTaskTest {
 
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
-        backupTask = new BackupTask(propStore, DB_NAME, SCHEMA_NAME, emailService, testProcessProvider);
+        postgresBackupTask = new PostgresBackupTask(propStore, DB_NAME, SCHEMA_NAME, emailService, testProcessProvider);
     }
 
     @Test
@@ -92,21 +92,21 @@ public class BackupTaskTest {
         when(process.exitValue())
                 .thenReturn(0);
 
-        backupTask.run();
+        postgresBackupTask.run();
         final var expectedCommand = new String[] {
-                BackupTask.PG_DUMP_CMD,
+                PostgresBackupTask.PG_DUMP_CMD,
                 DB_NAME,
-                BackupTask.SCHEMA_ARG,
+                PostgresBackupTask.SCHEMA_ARG,
                 SCHEMA_NAME,
-                BackupTask.HOST_ARG,
+                PostgresBackupTask.HOST_ARG,
                 HOST,
-                BackupTask.PORT_ARG,
+                PostgresBackupTask.PORT_ARG,
                 PORT,
-                BackupTask.USER_ARG,
+                PostgresBackupTask.USER_ARG,
                 USER,
-                BackupTask.USE_INSERT_STATEMENTS
+                PostgresBackupTask.USE_INSERT_STATEMENTS
         };
-        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+        final var expectedEnvironment = Map.of(PostgresBackupTask.PASSWORD_ENV, PASSWORD);
 
         assertTrue(testProcessProvider.getCommand().isDefined());
         assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));
@@ -139,21 +139,21 @@ public class BackupTaskTest {
         when(process.exitValue())
                 .thenReturn(1);
 
-        backupTask.run();
+        postgresBackupTask.run();
         final var expectedCommand = new String[] {
-                BackupTask.PG_DUMP_CMD,
+                PostgresBackupTask.PG_DUMP_CMD,
                 DB_NAME,
-                BackupTask.SCHEMA_ARG,
+                PostgresBackupTask.SCHEMA_ARG,
                 SCHEMA_NAME,
-                BackupTask.HOST_ARG,
+                PostgresBackupTask.HOST_ARG,
                 HOST,
-                BackupTask.PORT_ARG,
+                PostgresBackupTask.PORT_ARG,
                 PORT,
-                BackupTask.USER_ARG,
+                PostgresBackupTask.USER_ARG,
                 USER,
-                BackupTask.USE_INSERT_STATEMENTS
+                PostgresBackupTask.USE_INSERT_STATEMENTS
         };
-        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+        final var expectedEnvironment = Map.of(PostgresBackupTask.PASSWORD_ENV, PASSWORD);
 
         assertTrue(testProcessProvider.getCommand().isDefined());
         assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));
@@ -175,21 +175,21 @@ public class BackupTaskTest {
         when(process.exitValue())
                 .thenReturn(0);
 
-        backupTask.run();
+        postgresBackupTask.run();
         final var expectedCommand = new String[] {
-                BackupTask.PG_DUMP_CMD,
+                PostgresBackupTask.PG_DUMP_CMD,
                 DB_NAME,
-                BackupTask.SCHEMA_ARG,
+                PostgresBackupTask.SCHEMA_ARG,
                 SCHEMA_NAME,
-                BackupTask.HOST_ARG,
+                PostgresBackupTask.HOST_ARG,
                 HOST,
-                BackupTask.PORT_ARG,
+                PostgresBackupTask.PORT_ARG,
                 PORT,
-                BackupTask.USER_ARG,
+                PostgresBackupTask.USER_ARG,
                 USER,
-                BackupTask.USE_INSERT_STATEMENTS
+                PostgresBackupTask.USE_INSERT_STATEMENTS
         };
-        final var expectedEnvironment = Map.of(BackupTask.PASSWORD_ENV, PASSWORD);
+        final var expectedEnvironment = Map.of(PostgresBackupTask.PASSWORD_ENV, PASSWORD);
 
         assertTrue(testProcessProvider.getCommand().isDefined());
         assertTrue(Arrays.equals(expectedCommand, testProcessProvider.getCommand().get()));

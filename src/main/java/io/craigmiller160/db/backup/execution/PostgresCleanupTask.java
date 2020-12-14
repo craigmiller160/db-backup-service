@@ -30,17 +30,17 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class CleanupTask implements Runnable {
+public class PostgresCleanupTask implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(CleanupTask.class);
+    private static final Logger log = LoggerFactory.getLogger(PostgresCleanupTask.class);
 
     private final PropertyStore propStore;
     private final String database;
     private final String schema;
 
-    public CleanupTask(final PropertyStore propStore,
-                       final String database,
-                       final String schema) {
+    public PostgresCleanupTask(final PropertyStore propStore,
+                               final String database,
+                               final String schema) {
         this.propStore = propStore;
         this.database = database;
         this.schema = schema;

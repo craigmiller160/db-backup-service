@@ -24,7 +24,7 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 public class TaskFactory {
 
     public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
-        return new BackupTask(propStore, database, schema, emailService);
+        return new PostgresBackupTask(propStore, database, schema, emailService);
     }
 
     public Runnable createLivenessCheckTask(final PropertyStore propStore) {
@@ -32,7 +32,7 @@ public class TaskFactory {
     }
 
     public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
-        return new CleanupTask(propStore, database, schema);
+        return new PostgresCleanupTask(propStore, database, schema);
     }
 
 }

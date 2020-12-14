@@ -19,6 +19,8 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.config.dto.MongoBackupConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresBackupConfig;
 import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
@@ -60,10 +62,15 @@ public class BackupSchedulerTest {
         properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "300000");
         properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
         propStore = new PropertyStore(properties);
-        backupConfig = new BackupConfig(List.of(
-                new PostgresDatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
-                new PostgresDatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
-        ));
+        backupConfig = new BackupConfig(
+                new PostgresBackupConfig(
+                        List.of(
+                                new PostgresDatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
+                                new PostgresDatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
+                        )
+                ),
+                new MongoBackupConfig(new ArrayList<>())
+        );
         emailService = new EmailService(propStore);
         backupTaskFactory = new TestTaskFactory();
         backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory, emailService);
