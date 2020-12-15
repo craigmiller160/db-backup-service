@@ -26,6 +26,7 @@ import io.vavr.control.Try;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public abstract class AbstractBackupTask implements Runnable {
@@ -51,7 +52,10 @@ public abstract class AbstractBackupTask implements Runnable {
         final var outputTry = readStream(process.getInputStream());
         final var errorTry = readStream(process.getErrorStream());
 
-        return Try.of(process::waitFor)
+        return Try.of(() -> {
+            process.waitFor(5, TimeUnit.SECONDS);
+            return process.exitValue();
+        })
                 .flatMap(exitCode -> {
                     if (exitCode == 0) {
                         return outputTry;
