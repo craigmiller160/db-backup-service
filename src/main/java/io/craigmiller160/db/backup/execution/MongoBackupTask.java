@@ -82,7 +82,8 @@ public class MongoBackupTask extends AbstractBackupTask {
         };
         final var environment = new HashMap<String,String>();
 
-        Try.of(() -> processProvider.provide(command, environment));
+        Try.of(() -> processProvider.provide(command, environment))
+                .flatMap(this::readProcess);
         // TODO finish this
     }
 
