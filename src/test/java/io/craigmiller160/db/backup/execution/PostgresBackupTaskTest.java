@@ -121,7 +121,7 @@ public class PostgresBackupTaskTest {
         assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
 
         final var outputRootDir = new File(OUTPUT_ROOT);
-        final var postgresDir = new File(outputRootDir, PostgresBackupTask.POSTGRES_DIR);
+        final var postgresDir = new File(outputRootDir, BackupConstants.POSTGRES_DIR);
         final var outputDbDir = new File(postgresDir, DB_NAME);
         final var outputSchemaDir = new File(outputDbDir, SCHEMA_NAME);
         assertTrue(outputSchemaDir.exists());

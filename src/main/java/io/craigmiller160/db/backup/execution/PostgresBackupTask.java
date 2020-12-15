@@ -39,7 +39,6 @@ public class PostgresBackupTask extends AbstractBackupTask {
     public static final String PORT_ARG = "-p";
     public static final String USER_ARG = "-U";
     public static final String USE_INSERT_STATEMENTS = "--column-inserts";
-    public static final String POSTGRES_DIR = "Postgres";
 
     private static final Logger log = LoggerFactory.getLogger(PostgresBackupTask.class);
     public static final String PASSWORD_ENV = "PGPASSWORD";
@@ -94,7 +93,7 @@ public class PostgresBackupTask extends AbstractBackupTask {
 
     private Try<String> writeToFile(final String dbBackupText) {
         final var outputRootDir = new File(propStore.getOutputRootDirectory());
-        final var postgresRootDir = new File(outputRootDir, POSTGRES_DIR);
+        final var postgresRootDir = new File(outputRootDir, BackupConstants.POSTGRES_DIR);
         final var dbOutputDir = new File(postgresRootDir, database);
         final var schemaOutputDir = new File(dbOutputDir, schema);
 

@@ -36,7 +36,6 @@ public class MongoBackupTask extends AbstractBackupTask {
     public static final String OUTPUT_PATH_ARG = "-o";
     public static final String MONGODUMP_PATH = "/mongotools/mongodump";
     public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
-    public static final String MONGO_DIR = "MongoDB";
 
     private final String database;
 
@@ -66,7 +65,7 @@ public class MongoBackupTask extends AbstractBackupTask {
 
         final var uriArg = String.format(URI_TEMPLATE, user, password, host, port, database, authDb);
         final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
-        final var outputPath = Paths.get(propStore.getOutputRootDirectory(), MONGO_DIR, database, timestamp);
+        final var outputPath = Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database, timestamp);
 
         final var command = new String[] {
                 MONGODUMP_PATH,

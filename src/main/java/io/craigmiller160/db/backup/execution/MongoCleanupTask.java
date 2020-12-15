@@ -48,7 +48,7 @@ public class MongoCleanupTask  implements Runnable {
     public void run() {
         log.info("Running cleanup for MongoDB Database {}", database);
 
-        final var targetDir = Paths.get(propStore.getOutputRootDirectory(), MongoBackupTask.MONGO_DIR, database);
+        final var targetDir = Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database);
         if (!Files.exists(targetDir)) {
             log.info("Directory to cleanup MongoDB files does not exist: {}", targetDir.toAbsolutePath().toString());
             return;

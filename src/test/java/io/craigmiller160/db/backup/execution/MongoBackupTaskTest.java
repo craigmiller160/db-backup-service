@@ -100,7 +100,7 @@ public class MongoBackupTaskTest {
                 .thenReturn(0);
 
         final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
-        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+        final var outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.MONGO_DIR, DB_NAME, timestamp);
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {
@@ -127,7 +127,7 @@ public class MongoBackupTaskTest {
                 .thenThrow(new RuntimeException("Dying"));
 
         final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
-        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+        final var outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.MONGO_DIR, DB_NAME, timestamp);
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {
@@ -164,7 +164,7 @@ public class MongoBackupTaskTest {
                 .thenReturn(1);
 
         final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
-        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+        final var outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.MONGO_DIR, DB_NAME, timestamp);
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {

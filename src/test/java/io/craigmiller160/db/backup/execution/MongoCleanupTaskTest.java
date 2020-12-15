@@ -59,7 +59,7 @@ public class MongoCleanupTaskTest {
         time2 = LocalDateTime.of(2020, 1, 2, 0, 0, 0).format(BackupConstants.FORMAT);
         time3 = LocalDateTime.now().format(BackupConstants.FORMAT);
 
-        outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME);
+        outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.MONGO_DIR, DB_NAME);
 
         mongoCleanupTask = new MongoCleanupTask(propStore, DB_NAME);
     }

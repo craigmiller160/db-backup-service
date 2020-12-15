@@ -56,7 +56,7 @@ public class PostgresCleanupTaskTest {
         props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "10");
         propStore = new PropertyStore(props);
 
-        outputPath = Paths.get(OUTPUT_ROOT, PostgresBackupTask.POSTGRES_DIR, DB_NAME, SCHEMA_NAME);
+        outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.POSTGRES_DIR, DB_NAME, SCHEMA_NAME);
 
         final var time1 = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
         final var time2 = LocalDateTime.of(2020, 1, 2, 0, 0, 0);
