@@ -18,6 +18,6 @@ data:
   email.auth.password: db-backup-service-2020
   mongodump.command: /mongotools/mongodump
   db.mongo.host: mongodb-service
-  db.mongo.port: 27017
+  db.mongo.port: "27017"
   db.mongo.user: user
   db.mongo.password: password
