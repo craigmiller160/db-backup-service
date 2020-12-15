@@ -53,7 +53,7 @@ public abstract class AbstractBackupTask implements Runnable {
         final var errorTry = readStream(process.getErrorStream());
 
         return Try.of(() -> {
-            process.waitFor(5, TimeUnit.SECONDS);
+            process.waitFor(20, TimeUnit.SECONDS);
             return process.exitValue();
         })
                 .flatMap(exitCode -> {
