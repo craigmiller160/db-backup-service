@@ -23,7 +23,7 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 
 public class TaskFactory {
 
-    public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
+    public Runnable createPostgresBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
         return new PostgresBackupTask(propStore, database, schema, emailService);
     }
 
@@ -31,7 +31,7 @@ public class TaskFactory {
         return new LivenessCheckTask(propStore);
     }
 
-    public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
+    public Runnable createPostgresCleanupTask(final PropertyStore propStore, final String database, final String schema) {
         return new PostgresCleanupTask(propStore, database, schema);
     }
 
@@ -39,6 +39,8 @@ public class TaskFactory {
         return new MongoBackupTask(propStore, database, emailService);
     }
 
-    // TODO add mongo cleanup task
+    public Runnable createMongoCleanupTask(final PropertyStore propStore, final String database) {
+        return new MongoCleanupTask(propStore, database);
+    }
 
 }

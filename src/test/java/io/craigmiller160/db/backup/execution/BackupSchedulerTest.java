@@ -111,7 +111,7 @@ public class BackupSchedulerTest {
         private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
 
         @Override
-        public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
+        public Runnable createPostgresBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
             return () -> {
                 backupTaskProps.add(Tuple.of(database, schema));
             };
@@ -125,7 +125,7 @@ public class BackupSchedulerTest {
         }
 
         @Override
-        public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
+        public Runnable createPostgresCleanupTask(final PropertyStore propStore, final String database, final String schema) {
             return () -> {
                 cleanupTaskProps.add(Tuple.of(database, schema));
             };

@@ -18,7 +18,18 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
+
 public class MongoCleanupTask  implements Runnable {
+
+    private final PropertyStore propStore;
+    private final String database;
+
+    public MongoCleanupTask(final PropertyStore propStore,
+                            final String database) {
+        this.propStore = propStore;
+        this.database = database;
+    }
 
     @Override
     public void run() {
