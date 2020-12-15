@@ -93,7 +93,7 @@ public class MongoBackupTask extends AbstractBackupTask {
                 .onSuccess(content -> log.info("Successfully wrote MongoDB backup for Database {} to directory {}", database, outputPath.toString()))
                 .onFailure(ex -> {
                     log.error(String.format("Error running MongoDB backup for Database %s", database), ex);
-                    // TODO email alert here
+                    emailService.sendMongoErrorAlertEmail(database, ex);
                 });
     }
 

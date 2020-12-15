@@ -51,6 +51,11 @@ public class EmailService {
     public static final String EMAIL_URI = "/email";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
+    public static final String MONGO_ERROR_ALERT_MESSAGE = """
+            MongoDB Database Backup Failed
+            
+            Database: %s            
+            """;
     public static final String POSTGRES_ERROR_ALERT_MESSAGE = """
             Postgres Database Backup Failed
             
@@ -94,13 +99,6 @@ public class EmailService {
                 .get();
     }
 
-//    public void sendMongoErrorAlertEmail(final String database, final Throwable ex) {
-//        getAccessToken()
-//                .flatMap(accessToken -> {
-//
-//                });
-//    }
-
     private Try<String> sendErrorAlertEmail(final String dbSpecificErrorMessage, final Throwable ex) {
         return getAccessToken()
                 .flatMap(accessToken -> {
@@ -141,11 +139,18 @@ public class EmailService {
                 });
     }
 
+    public void sendMongoErrorAlertEmail(final String database, final Throwable ex) {
+        final var message = MONGO_ERROR_ALERT_MESSAGE.formatted(database);
+        sendErrorAlertEmail(message, ex)
+                .onSuccess((v) -> log.info("Successfully sent error alert email for MongoDB Database {}", database))
+                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for MongoDB Database %s", database), ex2));
+    }
+
     public void sendPostgresErrorAlertEmail(final String database, final String schema, final Throwable ex) {
         final var message = POSTGRES_ERROR_ALERT_MESSAGE.formatted(database, schema);
         sendErrorAlertEmail(message, ex)
-                .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
-                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
+                .onSuccess((v) -> log.info("Successfully sent error alert email for Postgres Database {} and Schema {}", database, schema))
+                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Postgres Database %s and Schema %s", database, schema), ex2));
     }
 
     protected ZonedDateTime getNowEastern() {
