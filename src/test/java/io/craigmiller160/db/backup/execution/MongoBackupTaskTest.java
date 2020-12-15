@@ -21,6 +21,7 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,11 +30,22 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MongoBackupTaskTest {
 
+    private static final String DATA_CONTENT = "Success";
     private static final String DB_NAME = "DbName";
     private static final String HOST = "host";
     private static final String PORT = "100";
@@ -74,7 +86,27 @@ public class MongoBackupTaskTest {
 
     @Test
     public void test_run() {
-        throw new RuntimeException();
+        when(process.getInputStream())
+                .thenReturn(IOUtils.toInputStream(DATA_CONTENT, StandardCharsets.UTF_8));
+        when(process.exitValue())
+                .thenReturn(0);
+
+        final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
+        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+
+        mongoBackupTask.run();
+        final var expectedCommand = new String[] {
+                MongoBackupTask.MONGODUMP_PATH,
+                MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.OUTPUT_PATH_ARG,
+                outputPath.toString()
+        };
+        final var expectedEnvironment = new HashMap<String,String>();
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertArrayEquals(expectedCommand, testProcessProvider.getCommand().get());
+
+        // TODO finish this
     }
 
     @Test
