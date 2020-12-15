@@ -20,6 +20,7 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.config.dto.MongoBackupConfig;
+import io.craigmiller160.db.backup.config.dto.MongoDatabaseConfig;
 import io.craigmiller160.db.backup.config.dto.PostgresBackupConfig;
 import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.email.EmailService;
@@ -69,7 +70,10 @@ public class BackupSchedulerTest {
                                 new PostgresDatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
                         )
                 ),
-                new MongoBackupConfig(new ArrayList<>())
+                new MongoBackupConfig(List.of(
+                        new MongoDatabaseConfig(DB_NAME),
+                        new MongoDatabaseConfig(DB_NAME_2)
+                ))
         );
         emailService = new EmailService(propStore);
         backupTaskFactory = new TestTaskFactory();
@@ -87,24 +91,34 @@ public class BackupSchedulerTest {
         Thread.sleep(1000);
         assertTrue(backupScheduler.stop());
 
-        final var backupTaskProps = backupTaskFactory.getPostgresBackupTaskProps();
-        assertEquals(3, backupTaskProps.size());
-        backupTaskProps.sort(Comparator.comparing(t -> t._2));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), backupTaskProps.get(0));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), backupTaskProps.get(1));
-        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), backupTaskProps.get(2));
+        final var postgresBackupTaskProps = backupTaskFactory.getPostgresBackupTaskProps();
+        assertEquals(3, postgresBackupTaskProps.size());
+        postgresBackupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), postgresBackupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), postgresBackupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), postgresBackupTaskProps.get(2));
 
-        final var cleanupTaskProps = backupTaskFactory.getPostgresCleanupTaskProps();
-        assertEquals(3, cleanupTaskProps.size());
-        backupTaskProps.sort(Comparator.comparing(t -> t._2));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), cleanupTaskProps.get(0));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), cleanupTaskProps.get(1));
-        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), cleanupTaskProps.get(2));
+        final var postgresCleanupTaskProps = backupTaskFactory.getPostgresCleanupTaskProps();
+        assertEquals(3, postgresCleanupTaskProps.size());
+        postgresCleanupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), postgresCleanupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), postgresCleanupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), postgresCleanupTaskProps.get(2));
+
+        final var mongoBackupTaskProps = backupTaskFactory.getMongoBackupTaskProps();
+        assertEquals(2, mongoBackupTaskProps.size());
+        mongoBackupTaskProps.sort(Comparator.naturalOrder());
+        assertEquals(DB_NAME, mongoBackupTaskProps.get(0));
+        assertEquals(DB_NAME_2, mongoBackupTaskProps.get(1));
+
+        final var mongoCleanupTaskProps = backupTaskFactory.getMongoCleanupTaskProps();
+        assertEquals(2, mongoCleanupTaskProps.size());
+        mongoCleanupTaskProps.sort(Comparator.naturalOrder());
+        assertEquals(DB_NAME, mongoCleanupTaskProps.get(0));
+        assertEquals(DB_NAME_2, mongoCleanupTaskProps.get(1));
 
         final var livenessCheckPropStore = backupTaskFactory.getLivenessCheckPropStore();
         assertTrue(livenessCheckPropStore.isDefined());
-
-        throw new RuntimeException("Validate Mongo Tasks");
     }
 
     private static class TestTaskFactory extends TaskFactory {
