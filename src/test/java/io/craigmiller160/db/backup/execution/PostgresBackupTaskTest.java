@@ -24,6 +24,7 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Option;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -70,7 +71,7 @@ public class PostgresBackupTaskTest {
     private TestProcessProvider testProcessProvider;
 
     @BeforeEach
-    public void setup() throws Exception {
+    public void beforeEach() throws Exception {
         FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
 
         final var props = new Properties();
@@ -83,6 +84,11 @@ public class PostgresBackupTaskTest {
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
         postgresBackupTask = new PostgresBackupTask(propStore, DB_NAME, SCHEMA_NAME, emailService, testProcessProvider);
+    }
+
+    @AfterEach
+    public void afterEach() throws Exception {
+        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
     }
 
     @Test
