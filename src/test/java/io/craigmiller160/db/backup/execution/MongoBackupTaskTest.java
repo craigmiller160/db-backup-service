@@ -19,6 +19,7 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.email.EmailService;
+import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,7 +42,12 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -109,16 +116,79 @@ public class MongoBackupTaskTest {
 
         assertTrue(testProcessProvider.getEnvironment().isDefined());
         assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
+
+        verify(emailService, times(0))
+                .sendMongoErrorAlertEmail(any(), any());
     }
 
     @Test
-    public void tst_run_error() {
-        throw new RuntimeException();
+    public void test_run_error() {
+        when(process.getInputStream())
+                .thenThrow(new RuntimeException("Dying"));
+
+        final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
+        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+
+        mongoBackupTask.run();
+        final var expectedCommand = new String[] {
+                MongoBackupTask.MONGODUMP_PATH,
+                MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.OUTPUT_PATH_ARG,
+                outputPath.toString()
+        };
+        final var expectedEnvironment = new HashMap<String,String>();
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertArrayEquals(expectedCommand, testProcessProvider.getCommand().get());
+
+        assertTrue(testProcessProvider.getEnvironment().isDefined());
+        assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
+
+        final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
+        verify(emailService, times(1))
+                .sendMongoErrorAlertEmail(eq(DB_NAME), exceptionCaptor.capture());
+
+        final var exception = exceptionCaptor.getValue();
+        assertNotNull(exception);
+        assertTrue(exception instanceof RuntimeException);
+        assertEquals("Dying", exception.getMessage());
     }
 
     @Test
     public void test_run_processError() {
-        throw new RuntimeException();
+        when(process.getInputStream())
+                .thenReturn(IOUtils.toInputStream("", StandardCharsets.UTF_8));
+        when(process.getErrorStream())
+                .thenReturn(IOUtils.toInputStream("Error Message", StandardCharsets.UTF_8));
+        when(process.exitValue())
+                .thenReturn(1);
+
+        final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
+        final var outputPath = Paths.get(OUTPUT_ROOT, MongoBackupTask.MONGO_DIR, DB_NAME, timestamp);
+
+        mongoBackupTask.run();
+        final var expectedCommand = new String[] {
+                MongoBackupTask.MONGODUMP_PATH,
+                MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.OUTPUT_PATH_ARG,
+                outputPath.toString()
+        };
+        final var expectedEnvironment = new HashMap<String,String>();
+
+        assertTrue(testProcessProvider.getCommand().isDefined());
+        assertArrayEquals(expectedCommand, testProcessProvider.getCommand().get());
+
+        assertTrue(testProcessProvider.getEnvironment().isDefined());
+        assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
+
+        final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
+        verify(emailService, times(1))
+                .sendMongoErrorAlertEmail(eq(DB_NAME), exceptionCaptor.capture());
+
+        final var exception = exceptionCaptor.getValue();
+        assertNotNull(exception);
+        assertTrue(exception instanceof BackupException);
+        assertEquals("Error Message", exception.getMessage());
     }
 
 }
