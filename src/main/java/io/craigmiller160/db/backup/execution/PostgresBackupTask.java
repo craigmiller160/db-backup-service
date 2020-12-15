@@ -34,7 +34,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PostgresBackupTask implements Runnable {
+public class PostgresBackupTask extends AbstractBackupTask {
 
     public static final String PG_DUMP_CMD = "pg_dump";
     public static final String HOST_ARG = "-h";
@@ -46,22 +46,17 @@ public class PostgresBackupTask implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(PostgresBackupTask.class);
     public static final String PASSWORD_ENV = "PGPASSWORD";
 
-    private final PropertyStore propStore;
     private final String database;
     private final String schema;
-    private final ProcessProvider processProvider;
-    private final EmailService emailService;
 
     public PostgresBackupTask(final PropertyStore propStore,
                               final String database,
                               final String schema,
                               final EmailService emailService,
                               final ProcessProvider processProvider) {
-        this.propStore = propStore;
+        super (propStore, processProvider, emailService);
         this.database = database;
         this.schema = schema;
-        this.processProvider = processProvider;
-        this.emailService = emailService;
     }
 
     public PostgresBackupTask(final PropertyStore propStore,
