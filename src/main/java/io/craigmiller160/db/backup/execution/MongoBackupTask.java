@@ -20,8 +20,15 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
 
 public class MongoBackupTask extends AbstractBackupTask {
+
+    private static final Logger log = LoggerFactory.getLogger(MongoBackupTask.class);
 
     /*
      * TODO I need:
@@ -33,6 +40,7 @@ public class MongoBackupTask extends AbstractBackupTask {
      *  - auth database
      */
 
+    private static final String OUTPUT_PATH_ARG = "-o";
     private static final String MONGODUMP_PATH = "/mongotools/mongodump";
     private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
 
@@ -56,6 +64,25 @@ public class MongoBackupTask extends AbstractBackupTask {
 
     @Override
     public void run() {
+        log.info("Running MongoDB backup for Database {}", database);
+
+        final var host = propStore.getMongoHost();
+        final var port = propStore.getMongoPort();
+        final var user = propStore.getMongoUser();
+        final var password = propStore.getMongoPassword();
+        final var authDb = propStore.getMongoAuthDb();
+
+        final var uriArg = String.format(URI_TEMPLATE, user, password, host, port, database, authDb);
+
+        final var command = new String[] {
+                MONGODUMP_PATH,
+                uriArg,
+                OUTPUT_PATH_ARG,
+                "" // TODO what should the output path be?
+        };
+        final var environment = new HashMap<String,String>();
+
+        Try.of(() -> processProvider.provide(command, environment));
         // TODO finish this
     }
 

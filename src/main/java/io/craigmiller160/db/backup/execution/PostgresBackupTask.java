@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 
 public class PostgresBackupTask extends AbstractBackupTask {
 
+    // TODO add a new parent directory for postgres
+
     public static final String PG_DUMP_CMD = "pg_dump";
     public static final String HOST_ARG = "-h";
     public static final String SCHEMA_ARG = "-n";
@@ -68,7 +70,7 @@ public class PostgresBackupTask extends AbstractBackupTask {
 
     @Override
     public void run() {
-        log.info("Running backup for Database {} and Schema {}", database, schema);
+        log.info("Running Postgres backup for Database {} and Schema {}", database, schema);
 
         final var command = new String[] {
                 PG_DUMP_CMD,
@@ -87,9 +89,9 @@ public class PostgresBackupTask extends AbstractBackupTask {
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readProcess)
                 .flatMap(this::writeToFile)
-                .onSuccess(filePath -> log.info("Successfully wrote backup for Database {} and Schema {} to File {}", database, schema, filePath))
+                .onSuccess(filePath -> log.info("Successfully wrote Postgres backup for Database {} and Schema {} to File {}", database, schema, filePath))
                 .onFailure(ex -> {
-                    log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex);
+                    log.error(String.format("Error running Postgres backup for Database %s and Schema %s", database, schema), ex);
                     emailService.sendPostgresErrorAlertEmail(database, schema, ex);
                 });
     }
