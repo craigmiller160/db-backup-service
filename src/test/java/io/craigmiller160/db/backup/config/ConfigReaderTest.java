@@ -19,7 +19,10 @@
 package io.craigmiller160.db.backup.config;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
-import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
+import io.craigmiller160.db.backup.config.dto.MongoBackupConfig;
+import io.craigmiller160.db.backup.config.dto.MongoDatabaseConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresBackupConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,14 +48,21 @@ public class ConfigReaderTest {
     @Test
     public void test_readBackupConfig() throws Exception {
         final var expected = new BackupConfig(
-                List.of(
-                        new DatabaseConfig(
-                                "vm_dev",
-                                List.of("public")
-                        ),
-                        new DatabaseConfig(
-                                "fake",
-                                List.of("public")
+                new PostgresBackupConfig(
+                        List.of(
+                                new PostgresDatabaseConfig(
+                                        "vm_dev",
+                                        List.of("public")
+                                ),
+                                new PostgresDatabaseConfig(
+                                        "fake",
+                                        List.of("public")
+                                )
+                        )
+                ),
+                new MongoBackupConfig(
+                        List.of(
+                                new MongoDatabaseConfig("covid_19_prod")
                         )
                 )
         );

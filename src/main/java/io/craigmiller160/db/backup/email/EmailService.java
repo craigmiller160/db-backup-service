@@ -51,11 +51,18 @@ public class EmailService {
     public static final String EMAIL_URI = "/email";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
-    public static final String ERROR_ALERT_MESSAGE = """
-            Database Backup Failed
+    public static final String MONGO_ERROR_ALERT_MESSAGE = """
+            MongoDB Database Backup Failed
+            
+            Database: %s            
+            """;
+    public static final String POSTGRES_ERROR_ALERT_MESSAGE = """
+            Postgres Database Backup Failed
             
             Database: %s
             Schema: %s
+            """;
+    public static final String GENERIC_MESSAGE = """
             Timestamp: %s
             Error Message: %s
             """;
@@ -92,12 +99,13 @@ public class EmailService {
                 .get();
     }
 
-    public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
-        getAccessToken()
+    private Try<String> sendErrorAlertEmail(final String dbSpecificErrorMessage, final Throwable ex) {
+        return getAccessToken()
                 .flatMap(accessToken -> {
                     final var timestamp = getNowEastern().format(FORMATTER);
                     final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
-                    final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
+                    final var genericMessagePart = GENERIC_MESSAGE.formatted(timestamp, errorMessage);
+                    final var emailText = String.format("%s%n%s", dbSpecificErrorMessage, genericMessagePart);
 
                     final var emailRequest = new EmailRequest(
                             List.of(propStore.getEmailTo()),
@@ -128,9 +136,21 @@ public class EmailService {
                                 }
                                 return Try.success("");
                             });
-                })
-                .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
-                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
+                });
+    }
+
+    public void sendMongoErrorAlertEmail(final String database, final Throwable ex) {
+        final var message = MONGO_ERROR_ALERT_MESSAGE.formatted(database);
+        sendErrorAlertEmail(message, ex)
+                .onSuccess((v) -> log.info("Successfully sent error alert email for MongoDB Database {}", database))
+                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for MongoDB Database %s", database), ex2));
+    }
+
+    public void sendPostgresErrorAlertEmail(final String database, final String schema, final Throwable ex) {
+        final var message = POSTGRES_ERROR_ALERT_MESSAGE.formatted(database, schema);
+        sendErrorAlertEmail(message, ex)
+                .onSuccess((v) -> log.info("Successfully sent error alert email for Postgres Database {} and Schema {}", database, schema))
+                .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Postgres Database %s and Schema %s", database, schema), ex2));
     }
 
     protected ZonedDateTime getNowEastern() {
@@ -148,7 +168,6 @@ public class EmailService {
         return ZonedDateTime.now(ZoneId.of("UTC")).compareTo(reuseTokenLimit) > 0;
     }
 
-    // TODO separate test for this
     private Try<String> getAccessToken() {
         synchronized (TOKEN_LOCK) {
             return Try.of(() -> {

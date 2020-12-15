@@ -33,6 +33,11 @@ public class PropertyStore {
     public static final String DB_POSTGRES_PORT = "db.postgres.port";
     public static final String DB_POSTGRES_USER = "db.postgres.user";
     public static final String DB_POSTGRES_PASSWORD = "db.postgres.password";
+    public static final String DB_MONGO_HOST = "db.mongo.host";
+    public static final String DB_MONGO_PORT = "db.mongo.port";
+    public static final String DB_MONGO_USER = "db.mongo.user";
+    public static final String DB_MONGO_PASSWORD = "db.mongo.password";
+    public static final String DB_MONGO_AUTH_DB = "db.mongo.auth-database";
     public static final String EXECUTOR_THREAD_COUNT = "executor.thread-count";
     public static final String EXECUTOR_INTERVAL_SECS = "executor.interval-secs";
     public static final String OUTPUT_ROOT_DIR = "output.root-directory";
@@ -46,6 +51,7 @@ public class PropertyStore {
     public static final String EMAIL_AUTH_USER = "email.auth.user";
     public static final String EMAIL_AUTH_PASSWORD = "email.auth.password";
     public static final String OUTPUT_CLEANUP_AGE_DAYS = "output.cleanup.age-days";
+    public static final String MONGODUMP_COMMAND = "mongodump.command";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.ofEntries(
@@ -53,6 +59,11 @@ public class PropertyStore {
                     Tuple.of(DB_POSTGRES_PORT, PropertyValidator.IS_NUMERIC),
                     Tuple.of(DB_POSTGRES_USER, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(DB_POSTGRES_PASSWORD, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_MONGO_HOST, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_MONGO_PORT, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(DB_MONGO_USER, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_MONGO_PASSWORD, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(DB_MONGO_AUTH_DB, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EXECUTOR_THREAD_COUNT, PropertyValidator.IS_NUMERIC),
                     Tuple.of(EXECUTOR_INTERVAL_SECS, PropertyValidator.IS_NUMERIC),
                     Tuple.of(OUTPUT_ROOT_DIR, PropertyValidator.IS_NOT_BLANK),
@@ -65,7 +76,8 @@ public class PropertyStore {
                     Tuple.of(EMAIL_AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_AUTH_USER, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_AUTH_PASSWORD, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC)
+                    Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(MONGODUMP_COMMAND, PropertyValidator.IS_NOT_BLANK)
             );
 
     private final Properties props;
@@ -154,6 +166,30 @@ public class PropertyStore {
 
     public int getOutputCleanupAgeDays() {
         return Integer.parseInt(props.getProperty(OUTPUT_CLEANUP_AGE_DAYS));
+    }
+
+    public String getMongoHost() {
+        return props.getProperty(DB_MONGO_HOST);
+    }
+
+    public int getMongoPort() {
+        return Integer.parseInt(props.getProperty(DB_MONGO_PORT));
+    }
+
+    public String getMongoUser() {
+        return props.getProperty(DB_MONGO_USER);
+    }
+
+    public String getMongoPassword() {
+        return props.getProperty(DB_MONGO_PASSWORD);
+    }
+
+    public String getMongoAuthDb() {
+        return props.getProperty(DB_MONGO_AUTH_DB);
+    }
+
+    public String getMongodumpCommand() {
+        return props.getProperty(MONGODUMP_COMMAND);
     }
 
 }

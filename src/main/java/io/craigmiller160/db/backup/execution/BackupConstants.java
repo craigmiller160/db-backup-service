@@ -24,6 +24,8 @@ public class BackupConstants {
 
     public static final DateTimeFormatter FORMAT = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
     public static final String TIME_ZONE = "US/Eastern";
+    public static final String POSTGRES_DIR = "Postgres";
+    public static final String MONGO_DIR = "MongoDB";
 
     private BackupConstants() {}
 

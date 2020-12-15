@@ -19,7 +19,10 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
-import io.craigmiller160.db.backup.config.dto.DatabaseConfig;
+import io.craigmiller160.db.backup.config.dto.MongoBackupConfig;
+import io.craigmiller160.db.backup.config.dto.MongoDatabaseConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresBackupConfig;
+import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
@@ -60,10 +63,18 @@ public class BackupSchedulerTest {
         properties.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "300000");
         properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
         propStore = new PropertyStore(properties);
-        backupConfig = new BackupConfig(List.of(
-                new DatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
-                new DatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
-        ));
+        backupConfig = new BackupConfig(
+                new PostgresBackupConfig(
+                        List.of(
+                                new PostgresDatabaseConfig(DB_NAME, List.of(SCHEMA_1, SCHEMA_2)),
+                                new PostgresDatabaseConfig(DB_NAME_2, List.of(SCHEMA_3))
+                        )
+                ),
+                new MongoBackupConfig(List.of(
+                        new MongoDatabaseConfig(DB_NAME),
+                        new MongoDatabaseConfig(DB_NAME_2)
+                ))
+        );
         emailService = new EmailService(propStore);
         backupTaskFactory = new TestTaskFactory();
         backupScheduler = new BackupScheduler(propStore, backupConfig, backupTaskFactory, emailService);
@@ -80,33 +91,47 @@ public class BackupSchedulerTest {
         Thread.sleep(1000);
         assertTrue(backupScheduler.stop());
 
-        final var backupTaskProps = backupTaskFactory.getBackupTaskProps();
-        assertEquals(3, backupTaskProps.size());
-        backupTaskProps.sort(Comparator.comparing(t -> t._2));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), backupTaskProps.get(0));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), backupTaskProps.get(1));
-        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), backupTaskProps.get(2));
+        final var postgresBackupTaskProps = backupTaskFactory.getPostgresBackupTaskProps();
+        assertEquals(3, postgresBackupTaskProps.size());
+        postgresBackupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), postgresBackupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), postgresBackupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), postgresBackupTaskProps.get(2));
 
-        final var cleanupTaskProps = backupTaskFactory.getCleanupTaskProps();
-        assertEquals(3, cleanupTaskProps.size());
-        backupTaskProps.sort(Comparator.comparing(t -> t._2));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), cleanupTaskProps.get(0));
-        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), cleanupTaskProps.get(1));
-        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), cleanupTaskProps.get(2));
+        final var postgresCleanupTaskProps = backupTaskFactory.getPostgresCleanupTaskProps();
+        assertEquals(3, postgresCleanupTaskProps.size());
+        postgresCleanupTaskProps.sort(Comparator.comparing(t -> t._2));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_1), postgresCleanupTaskProps.get(0));
+        assertEquals(Tuple.of(DB_NAME, SCHEMA_2), postgresCleanupTaskProps.get(1));
+        assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), postgresCleanupTaskProps.get(2));
+
+        final var mongoBackupTaskProps = backupTaskFactory.getMongoBackupTaskProps();
+        assertEquals(2, mongoBackupTaskProps.size());
+        mongoBackupTaskProps.sort(Comparator.naturalOrder());
+        assertEquals(DB_NAME, mongoBackupTaskProps.get(0));
+        assertEquals(DB_NAME_2, mongoBackupTaskProps.get(1));
+
+        final var mongoCleanupTaskProps = backupTaskFactory.getMongoCleanupTaskProps();
+        assertEquals(2, mongoCleanupTaskProps.size());
+        mongoCleanupTaskProps.sort(Comparator.naturalOrder());
+        assertEquals(DB_NAME, mongoCleanupTaskProps.get(0));
+        assertEquals(DB_NAME_2, mongoCleanupTaskProps.get(1));
 
         final var livenessCheckPropStore = backupTaskFactory.getLivenessCheckPropStore();
         assertTrue(livenessCheckPropStore.isDefined());
     }
 
     private static class TestTaskFactory extends TaskFactory {
-        private final List<Tuple2<String,String>> backupTaskProps = Collections.synchronizedList(new ArrayList<>());
-        private final List<Tuple2<String,String>> cleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> postgresBackupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> postgresCleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
         private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
+        private final List<String> mongoBackupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<String> mongoCleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
 
         @Override
-        public Runnable createBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
+        public Runnable createPostgresBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
             return () -> {
-                backupTaskProps.add(Tuple.of(database, schema));
+                postgresBackupTaskProps.add(Tuple.of(database, schema));
             };
         }
 
@@ -118,22 +143,44 @@ public class BackupSchedulerTest {
         }
 
         @Override
-        public Runnable createCleanupTask(final PropertyStore propStore, final String database, final String schema) {
+        public Runnable createPostgresCleanupTask(final PropertyStore propStore, final String database, final String schema) {
             return () -> {
-                cleanupTaskProps.add(Tuple.of(database, schema));
+                postgresCleanupTaskProps.add(Tuple.of(database, schema));
             };
         }
 
-        public List<Tuple2<String,String>> getBackupTaskProps() {
-            return new ArrayList<>(backupTaskProps);
+        @Override
+        public Runnable createMongoBackupTask(final PropertyStore propStore, final EmailService emailService, final String database) {
+            return () -> {
+                mongoBackupTaskProps.add(database);
+            };
+        }
+
+        @Override
+        public Runnable createMongoCleanupTask(final PropertyStore propStore, final String database) {
+            return () -> {
+                mongoCleanupTaskProps.add(database);
+            };
+        }
+
+        public List<Tuple2<String,String>> getPostgresBackupTaskProps() {
+            return new ArrayList<>(postgresBackupTaskProps);
         }
 
         public Option<PropertyStore> getLivenessCheckPropStore() {
             return Option.of(livenessCheckPropStore.get());
         }
 
-        public List<Tuple2<String,String>> getCleanupTaskProps() {
-            return new ArrayList<>(cleanupTaskProps);
+        public List<Tuple2<String,String>> getPostgresCleanupTaskProps() {
+            return new ArrayList<>(postgresCleanupTaskProps);
+        }
+
+        public List<String> getMongoCleanupTaskProps() {
+            return new ArrayList<>(mongoCleanupTaskProps);
+        }
+
+        public List<String> getMongoBackupTaskProps() {
+            return new ArrayList<>(mongoBackupTaskProps);
         }
     }
 

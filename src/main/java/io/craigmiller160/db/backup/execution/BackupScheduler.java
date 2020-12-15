@@ -19,9 +19,11 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
+import io.craigmiller160.db.backup.config.dto.MongoDatabaseConfig;
 import io.craigmiller160.db.backup.email.EmailService;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +55,7 @@ public class BackupScheduler {
 
     public void start() {
         this.executor.scheduleAtFixedRate(taskFactory.createLivenessCheckTask(propStore), 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
-        backupConfig.databases()
+        backupConfig.postgres().databases()
                 .stream()
                 .flatMap(db ->
                         db.schemas()
@@ -61,16 +63,28 @@ public class BackupScheduler {
                                 .map(schema -> Tuple.of(db.name(), schema))
                 )
                 .map(tuple -> {
-                    final var backupTask = taskFactory.createBackupTask(propStore, emailService, tuple._1, tuple._2);
-                    final var cleanupTask = taskFactory.createCleanupTask(propStore, tuple._1, tuple._2);
+                    final var backupTask = taskFactory.createPostgresBackupTask(propStore, emailService, tuple._1, tuple._2);
+                    final var cleanupTask = taskFactory.createPostgresCleanupTask(propStore, tuple._1, tuple._2);
                     return Tuple.of(backupTask, cleanupTask);
                 })
-                .forEach(taskTuple -> {
-                    final var backupTask = taskTuple._1;
-                    final var cleanupTask = taskTuple._2;
-                    executor.scheduleAtFixedRate(backupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
-                    executor.scheduleAtFixedRate(cleanupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
-                });
+                .forEach(this::scheduleTaskPair);
+
+        backupConfig.mongodb().databases()
+                .stream()
+                .map(MongoDatabaseConfig::name)
+                .map(dbName -> {
+                    final var backupTask = taskFactory.createMongoBackupTask(propStore, emailService, dbName);
+                    final var cleanupTask = taskFactory.createMongoCleanupTask(propStore, dbName);
+                    return Tuple.of(backupTask, cleanupTask);
+                })
+                .forEach(this::scheduleTaskPair);
+    }
+
+    private void scheduleTaskPair(final Tuple2<Runnable,Runnable> taskTuple) {
+        final var backupTask = taskTuple._1;
+        final var cleanupTask = taskTuple._2;
+        executor.scheduleAtFixedRate(backupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
+        executor.scheduleAtFixedRate(cleanupTask, 0, propStore.getExecutorIntervalSecs(), TimeUnit.SECONDS);
     }
 
     public boolean stop() {

@@ -14,6 +14,8 @@ This requires `pg_dump` to be available on the host system. To install it, run t
 sudo apt install -y postgresql-client
 ```
 
+This also requires `mongodump` to be available. The binary for it is in the `deploy/mongotools` directory for prod deployment. It can be installed from the web too, please make sure it is on the `PATH`.
+
 ## Running in Development
 
 Use IntelliJ to run the `Runner.java` file.

@@ -1,16 +1,25 @@
 {
-  "databases": [
-    {
-      "name": "vm_dev",
-      "schemas": [
-        "public"
-      ]
-    },
-    {
-      "name": "fake",
-      "schemas": [
-        "public"
-      ]
-    }
-  ]
+  "postgres": {
+    "databases": [
+      {
+        "name": "vm_dev",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "fake",
+        "schemas": [
+          "public"
+        ]
+      }
+    ]
+  },
+  "mongodb": {
+    "databases": [
+      {
+        "name": "covid_19_prod"
+      }
+    ]
+  }
 }
