@@ -31,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -106,7 +107,8 @@ public class MongoBackupTaskTest {
         assertTrue(testProcessProvider.getCommand().isDefined());
         assertArrayEquals(expectedCommand, testProcessProvider.getCommand().get());
 
-        // TODO finish this
+        assertTrue(testProcessProvider.getEnvironment().isDefined());
+        assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
     }
 
     @Test
