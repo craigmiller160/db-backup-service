@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 
 public class MongoBackupTask extends AbstractBackupTask {
@@ -44,7 +46,7 @@ public class MongoBackupTask extends AbstractBackupTask {
     private static final String OUTPUT_PATH_ARG = "-o";
     private static final String MONGODUMP_PATH = "/mongotools/mongodump";
     private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
-    private static final String MONGO_DIR = "MongoDb";
+    private static final String MONGO_DIR = "MongoDB";
 
     private final String database;
 
@@ -75,7 +77,8 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var authDb = propStore.getMongoAuthDb();
 
         final var uriArg = String.format(URI_TEMPLATE, user, password, host, port, database, authDb);
-        final var outputPath = Paths.get(propStore.getOutputRootDirectory(), MONGO_DIR, database);
+        final var timestamp = BackupConstants.FORMAT.format(ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE)));
+        final var outputPath = Paths.get(propStore.getOutputRootDirectory(), MONGO_DIR, database, timestamp);
 
         final var command = new String[] {
                 MONGODUMP_PATH,
@@ -86,8 +89,12 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var environment = new HashMap<String,String>();
 
         Try.of(() -> processProvider.provide(command, environment))
-                .flatMap(this::readProcess);
-        // TODO finish this
+                .flatMap(this::readProcess)
+                .onSuccess(content -> log.info("Successfully wrote MongoDB backup for Database {} to directory {}", database, outputPath.toString()))
+                .onFailure(ex -> {
+                    log.error(String.format("Error running MongoDB backup for Database %s", database), ex);
+                    // TODO email alert here
+                });
     }
 
 }
