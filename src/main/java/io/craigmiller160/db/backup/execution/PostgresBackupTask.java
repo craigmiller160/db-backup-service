@@ -95,7 +95,7 @@ public class PostgresBackupTask implements Runnable {
                 .onSuccess(filePath -> log.info("Successfully wrote backup for Database {} and Schema {} to File {}", database, schema, filePath))
                 .onFailure(ex -> {
                     log.error(String.format("Error running backup for Database %s and Schema %s", database, schema), ex);
-                    emailService.sendErrorAlertEmail(database, schema, ex);
+                    emailService.sendPostgresErrorAlertEmail(database, schema, ex);
                 });
     }
 

@@ -102,7 +102,7 @@ public class EmailServiceTest {
                 Collections.emptyList(),
                 Collections.emptyList(),
                 EmailService.ERROR_ALERT_SUBJECT,
-                EmailService.ERROR_ALERT_MESSAGE.formatted(
+                EmailService.POSTGRES_ERROR_ALERT_MESSAGE.formatted(
                         DATABASE, SCHEMA, NOW.format(EmailService.FORMATTER),
                         String.format("%s - %s", EXCEPTION.getClass().getName(), EXCEPTION.getMessage())
                 )
@@ -113,7 +113,7 @@ public class EmailServiceTest {
                 .thenReturn(tokenResponse)
                 .thenReturn(emailResponse);
 
-        emailService.sendErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
+        emailService.sendPostgresErrorAlertEmail(DATABASE, SCHEMA, EXCEPTION);
 
         final var requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
 

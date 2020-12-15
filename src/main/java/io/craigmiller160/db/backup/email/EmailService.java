@@ -51,8 +51,8 @@ public class EmailService {
     public static final String EMAIL_URI = "/email";
     public static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     public static final String ERROR_ALERT_SUBJECT = "ERROR ALERT - Database Backup Failed";
-    public static final String ERROR_ALERT_MESSAGE = """
-            Database Backup Failed
+    public static final String POSTGRES_ERROR_ALERT_MESSAGE = """
+            Postgres Database Backup Failed
             
             Database: %s
             Schema: %s
@@ -92,12 +92,12 @@ public class EmailService {
                 .get();
     }
 
-    public void sendErrorAlertEmail(final String database, final String schema, final Throwable ex) {
+    public void sendPostgresErrorAlertEmail(final String database, final String schema, final Throwable ex) {
         getAccessToken()
                 .flatMap(accessToken -> {
                     final var timestamp = getNowEastern().format(FORMATTER);
                     final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
-                    final var emailText = ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
+                    final var emailText = POSTGRES_ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
 
                     final var emailRequest = new EmailRequest(
                             List.of(propStore.getEmailTo()),

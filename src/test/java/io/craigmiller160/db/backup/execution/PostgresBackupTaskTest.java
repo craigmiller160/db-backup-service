@@ -127,7 +127,7 @@ public class PostgresBackupTaskTest {
         assertEquals(DATA_CONTENT, fileContent);
 
         verify(emailService, times(0))
-                .sendErrorAlertEmail(any(), any(), any());
+                .sendPostgresErrorAlertEmail(any(), any(), any());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class PostgresBackupTaskTest {
 
         final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
         verify(emailService, times(1))
-                .sendErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
+                .sendPostgresErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
 
         final var exception = exceptionCaptor.getValue();
         assertNotNull(exception);
@@ -201,7 +201,7 @@ public class PostgresBackupTaskTest {
 
         final var exceptionCaptor = ArgumentCaptor.forClass(Throwable.class);
         verify(emailService, times(1))
-                .sendErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
+                .sendPostgresErrorAlertEmail(eq(DB_NAME), eq(SCHEMA_NAME), exceptionCaptor.capture());
 
         final var exception = exceptionCaptor.getValue();
         assertNotNull(exception);
