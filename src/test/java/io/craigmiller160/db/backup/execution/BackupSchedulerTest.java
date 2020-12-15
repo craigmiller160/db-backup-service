@@ -87,14 +87,14 @@ public class BackupSchedulerTest {
         Thread.sleep(1000);
         assertTrue(backupScheduler.stop());
 
-        final var backupTaskProps = backupTaskFactory.getBackupTaskProps();
+        final var backupTaskProps = backupTaskFactory.getPostgresBackupTaskProps();
         assertEquals(3, backupTaskProps.size());
         backupTaskProps.sort(Comparator.comparing(t -> t._2));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_1), backupTaskProps.get(0));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_2), backupTaskProps.get(1));
         assertEquals(Tuple.of(DB_NAME_2, SCHEMA_3), backupTaskProps.get(2));
 
-        final var cleanupTaskProps = backupTaskFactory.getCleanupTaskProps();
+        final var cleanupTaskProps = backupTaskFactory.getPostgresCleanupTaskProps();
         assertEquals(3, cleanupTaskProps.size());
         backupTaskProps.sort(Comparator.comparing(t -> t._2));
         assertEquals(Tuple.of(DB_NAME, SCHEMA_1), cleanupTaskProps.get(0));
@@ -108,14 +108,16 @@ public class BackupSchedulerTest {
     }
 
     private static class TestTaskFactory extends TaskFactory {
-        private final List<Tuple2<String,String>> backupTaskProps = Collections.synchronizedList(new ArrayList<>());
-        private final List<Tuple2<String,String>> cleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> postgresBackupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<Tuple2<String,String>> postgresCleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
         private final AtomicReference<PropertyStore> livenessCheckPropStore = new AtomicReference<>(null);
+        private final List<String> mongoBackupTaskProps = Collections.synchronizedList(new ArrayList<>());
+        private final List<String> mongoCleanupTaskProps = Collections.synchronizedList(new ArrayList<>());
 
         @Override
         public Runnable createPostgresBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
             return () -> {
-                backupTaskProps.add(Tuple.of(database, schema));
+                postgresBackupTaskProps.add(Tuple.of(database, schema));
             };
         }
 
@@ -129,20 +131,42 @@ public class BackupSchedulerTest {
         @Override
         public Runnable createPostgresCleanupTask(final PropertyStore propStore, final String database, final String schema) {
             return () -> {
-                cleanupTaskProps.add(Tuple.of(database, schema));
+                postgresCleanupTaskProps.add(Tuple.of(database, schema));
             };
         }
 
-        public List<Tuple2<String,String>> getBackupTaskProps() {
-            return new ArrayList<>(backupTaskProps);
+        @Override
+        public Runnable createMongoBackupTask(final PropertyStore propStore, final EmailService emailService, final String database) {
+            return () -> {
+                mongoBackupTaskProps.add(database);
+            };
+        }
+
+        @Override
+        public Runnable createMongoCleanupTask(final PropertyStore propStore, final String database) {
+            return () -> {
+                mongoCleanupTaskProps.add(database);
+            };
+        }
+
+        public List<Tuple2<String,String>> getPostgresBackupTaskProps() {
+            return new ArrayList<>(postgresBackupTaskProps);
         }
 
         public Option<PropertyStore> getLivenessCheckPropStore() {
             return Option.of(livenessCheckPropStore.get());
         }
 
-        public List<Tuple2<String,String>> getCleanupTaskProps() {
-            return new ArrayList<>(cleanupTaskProps);
+        public List<Tuple2<String,String>> getPostgresCleanupTaskProps() {
+            return new ArrayList<>(postgresCleanupTaskProps);
+        }
+
+        public List<String> getMongoCleanupTaskProps() {
+            return new ArrayList<>(mongoCleanupTaskProps);
+        }
+
+        public List<String> getMongoBackupTaskProps() {
+            return new ArrayList<>(mongoBackupTaskProps);
         }
     }
 
