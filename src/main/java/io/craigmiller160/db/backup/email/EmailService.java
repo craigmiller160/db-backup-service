@@ -56,6 +56,8 @@ public class EmailService {
             
             Database: %s
             Schema: %s
+            """;
+    public static final String GENERIC_MESSAGE = """
             Timestamp: %s
             Error Message: %s
             """;
@@ -92,12 +94,20 @@ public class EmailService {
                 .get();
     }
 
-    public void sendPostgresErrorAlertEmail(final String database, final String schema, final Throwable ex) {
-        getAccessToken()
+//    public void sendMongoErrorAlertEmail(final String database, final Throwable ex) {
+//        getAccessToken()
+//                .flatMap(accessToken -> {
+//
+//                });
+//    }
+
+    private Try<String> sendErrorAlertEmail(final String dbSpecificErrorMessage, final Throwable ex) {
+        return getAccessToken()
                 .flatMap(accessToken -> {
                     final var timestamp = getNowEastern().format(FORMATTER);
                     final var errorMessage = String.format("%s - %s", ex.getClass().getName(), ex.getMessage());
-                    final var emailText = POSTGRES_ERROR_ALERT_MESSAGE.formatted(database, schema, timestamp, errorMessage);
+                    final var genericMessagePart = GENERIC_MESSAGE.formatted(timestamp, errorMessage);
+                    final var emailText = String.format("%s%n%s", dbSpecificErrorMessage, genericMessagePart);
 
                     final var emailRequest = new EmailRequest(
                             List.of(propStore.getEmailTo()),
@@ -128,7 +138,12 @@ public class EmailService {
                                 }
                                 return Try.success("");
                             });
-                })
+                });
+    }
+
+    public void sendPostgresErrorAlertEmail(final String database, final String schema, final Throwable ex) {
+        final var message = POSTGRES_ERROR_ALERT_MESSAGE.formatted(database, schema);
+        sendErrorAlertEmail(message, ex)
                 .onSuccess((v) -> log.info("Successfully sent error alert email for Database {} and Schema {}", database, schema))
                 .onFailure(ex2 -> log.error(String.format("Error sending error alert email for Database %s and Schema %s", database, schema), ex2));
     }
@@ -148,7 +163,6 @@ public class EmailService {
         return ZonedDateTime.now(ZoneId.of("UTC")).compareTo(reuseTokenLimit) > 0;
     }
 
-    // TODO separate test for this
     private Try<String> getAccessToken() {
         synchronized (TOKEN_LOCK) {
             return Try.of(() -> {
