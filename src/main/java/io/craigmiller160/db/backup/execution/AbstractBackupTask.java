@@ -51,14 +51,14 @@ public abstract class AbstractBackupTask implements Runnable {
         final var outputTry = readStream(process.getInputStream());
         final var errorTry = readStream(process.getErrorStream());
 
-        process.destroy();
-        final var exitCode = process.exitValue();
+        return Try.of(process::waitFor)
+                .flatMap(exitCode -> {
+                    if (exitCode == 0) {
+                        return outputTry;
+                    }
 
-        if (exitCode == 0) {
-            return outputTry;
-        }
-
-        return errorTry.flatMap(content -> Try.failure(new BackupException(content)));
+                    return errorTry.flatMap(content -> Try.failure(new BackupException(content)));
+                });
     }
 
 }
