@@ -51,6 +51,7 @@ public class PropertyStore {
     public static final String EMAIL_AUTH_USER = "email.auth.user";
     public static final String EMAIL_AUTH_PASSWORD = "email.auth.password";
     public static final String OUTPUT_CLEANUP_AGE_DAYS = "output.cleanup.age-days";
+    public static final String MONGODUMP_COMMAND = "mongodump.command";
 
     private static final Map<String,PropertyValidator> PROPERTY_VALIDATION_MAP =
             HashMap.ofEntries(
@@ -75,7 +76,8 @@ public class PropertyStore {
                     Tuple.of(EMAIL_AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_AUTH_USER, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_AUTH_PASSWORD, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC)
+                    Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC),
+                    Tuple.of(MONGODUMP_COMMAND, PropertyValidator.IS_NOT_BLANK)
             );
 
     private final Properties props;
@@ -186,6 +188,8 @@ public class PropertyStore {
         return props.getProperty(DB_MONGO_AUTH_DB);
     }
 
-
+    public String getMongodumpCommand() {
+        return props.getProperty(MONGODUMP_COMMAND);
+    }
 
 }

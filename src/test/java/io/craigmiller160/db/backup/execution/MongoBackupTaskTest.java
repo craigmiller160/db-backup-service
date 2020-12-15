@@ -53,6 +53,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class MongoBackupTaskTest {
 
+    private static final String MONGODUMP = "mongodump";
     private static final String DATA_CONTENT = "Success";
     private static final String DB_NAME = "DbName";
     private static final String HOST = "host";
@@ -81,6 +82,7 @@ public class MongoBackupTaskTest {
         props.setProperty(PropertyStore.DB_MONGO_PASSWORD, PASSWORD);
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
         props.setProperty(PropertyStore.DB_MONGO_AUTH_DB, AUTH_DB);
+        props.setProperty(PropertyStore.MONGODUMP_COMMAND, MONGODUMP);
 
         propStore = new PropertyStore(props);
         testProcessProvider = new TestProcessProvider(process);
@@ -104,7 +106,7 @@ public class MongoBackupTaskTest {
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {
-                MongoBackupTask.MONGODUMP_PATH,
+                MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()
@@ -131,7 +133,7 @@ public class MongoBackupTaskTest {
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {
-                MongoBackupTask.MONGODUMP_PATH,
+                MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()
@@ -168,7 +170,7 @@ public class MongoBackupTaskTest {
 
         mongoBackupTask.run();
         final var expectedCommand = new String[] {
-                MongoBackupTask.MONGODUMP_PATH,
+                MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()

@@ -34,7 +34,6 @@ public class MongoBackupTask extends AbstractBackupTask {
     private static final Logger log = LoggerFactory.getLogger(MongoBackupTask.class);
 
     public static final String OUTPUT_PATH_ARG = "-o";
-    public static final String MONGODUMP_PATH = "/mongotools/mongodump";
     public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
 
     private final String database;
@@ -68,7 +67,7 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var outputPath = Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database, timestamp);
 
         final var command = new String[] {
-                MONGODUMP_PATH,
+                propStore.getMongodumpCommand(),
                 uriArg,
                 OUTPUT_PATH_ARG,
                 outputPath.toString()

@@ -16,3 +16,4 @@ data:
   email.auth.client-secret: c078af10-7f97-4afb-981d-76ecacb7dbfd
   email.auth.user: dbBackupService@gmail.com
   email.auth.password: db-backup-service-2020
+  mongodump.command: /mongotools/mongodump
