@@ -24,6 +24,7 @@ import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class MongoBackupTask extends AbstractBackupTask {
@@ -43,6 +44,7 @@ public class MongoBackupTask extends AbstractBackupTask {
     private static final String OUTPUT_PATH_ARG = "-o";
     private static final String MONGODUMP_PATH = "/mongotools/mongodump";
     private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
+    private static final String MONGO_DIR = "MongoDb";
 
     private final String database;
 
@@ -73,12 +75,13 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var authDb = propStore.getMongoAuthDb();
 
         final var uriArg = String.format(URI_TEMPLATE, user, password, host, port, database, authDb);
+        final var outputPath = Paths.get(propStore.getOutputRootDirectory(), MONGO_DIR, database);
 
         final var command = new String[] {
                 MONGODUMP_PATH,
                 uriArg,
                 OUTPUT_PATH_ARG,
-                "" // TODO what should the output path be?
+                outputPath.toString()
         };
         final var environment = new HashMap<String,String>();
 
