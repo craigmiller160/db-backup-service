@@ -208,29 +208,4 @@ public class PostgresBackupTaskTest {
         assertEquals("Dying", exception.getMessage());
     }
 
-    private static class TestProcessProvider implements ProcessProvider {
-        private String[] command = null;
-        private Map<String,String> environment = null;
-        private final Process mockProcess;
-
-        public TestProcessProvider(final Process mockProcess) {
-            this.mockProcess = mockProcess;
-        }
-
-        @Override
-        public Process provide(final String[] command, final Map<String, String> environment) throws IOException {
-            this.command = command;
-            this.environment = environment;
-            return mockProcess;
-        }
-
-        public Option<String[]> getCommand() {
-            return Option.of(command);
-        }
-
-        public Option<Map<String,String>> getEnvironment() {
-            return Option.of(environment);
-        }
-    }
-
 }
