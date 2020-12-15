@@ -103,6 +103,8 @@ public class BackupSchedulerTest {
 
         final var livenessCheckPropStore = backupTaskFactory.getLivenessCheckPropStore();
         assertTrue(livenessCheckPropStore.isDefined());
+
+        throw new RuntimeException("Validate Mongo Tasks");
     }
 
     private static class TestTaskFactory extends TaskFactory {
