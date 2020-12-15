@@ -19,7 +19,14 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.email.EmailService;
+import io.craigmiller160.db.backup.exception.BackupException;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.control.Try;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 
 public abstract class AbstractBackupTask implements Runnable {
 
@@ -33,6 +40,25 @@ public abstract class AbstractBackupTask implements Runnable {
         this.propStore = propStore;
         this.processProvider = processProvider;
         this.emailService = emailService;
+    }
+
+    private Try<String> readStream(final InputStream stream) {
+        return Try.withResources(() -> new BufferedReader(new InputStreamReader(stream)))
+                .of(reader -> reader.lines().collect(Collectors.joining("\n")));
+    }
+
+    protected Try<String> readProcess(final Process process) {
+        final var outputTry = readStream(process.getInputStream());
+        final var errorTry = readStream(process.getErrorStream());
+
+        process.destroy();
+        final var exitCode = process.exitValue();
+
+        if (exitCode == 0) {
+            return outputTry;
+        }
+
+        return errorTry.flatMap(content -> Try.failure(new BackupException(content)));
     }
 
 }

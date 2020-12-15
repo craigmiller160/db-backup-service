@@ -96,30 +96,6 @@ public class PostgresBackupTask extends AbstractBackupTask {
                 });
     }
 
-    private Try<String> readProcess(final Process process) {
-        final var outputTry = readOutput(process);
-        final var errorTry = readError(process);
-
-        process.destroy();
-        final var exitCode = process.exitValue();
-
-        if (exitCode == 0) {
-            return outputTry;
-        }
-
-        return errorTry.flatMap(content -> Try.failure(new BackupException(content)));
-    }
-
-    private Try<String> readOutput(final Process process) {
-        return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getInputStream())))
-                .of(reader -> reader.lines().collect(Collectors.joining("\n")));
-    }
-
-    private Try<String> readError(final Process process) {
-        return Try.withResources(() -> new BufferedReader(new InputStreamReader(process.getErrorStream())))
-                .of(reader -> reader.lines().collect(Collectors.joining("\n")));
-    }
-
     private Try<String> writeToFile(final String dbBackupText) {
         final var outputRootDir = new File(propStore.getOutputRootDirectory());
         final var dbOutputDir = new File(outputRootDir, database);
