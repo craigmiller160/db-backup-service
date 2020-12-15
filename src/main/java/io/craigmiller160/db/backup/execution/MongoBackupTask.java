@@ -20,6 +20,19 @@ package io.craigmiller160.db.backup.execution;
 
 public class MongoBackupTask implements Runnable {
 
+    /*
+     * TODO I need:
+     *  - host
+     *  - port
+     *  - username
+     *  - password
+     *  - database
+     *  - auth database
+     */
+
+    private static final String MONGODUMP_PATH = "/mongotools/mongodump";
+    private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
+
     @Override
     public void run() {
         // TODO finish this
