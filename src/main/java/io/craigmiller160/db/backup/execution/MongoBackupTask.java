@@ -33,24 +33,12 @@ public class MongoBackupTask extends AbstractBackupTask {
 
     private static final Logger log = LoggerFactory.getLogger(MongoBackupTask.class);
 
-    /*
-     * TODO I need:
-     *  - host
-     *  - port
-     *  - username
-     *  - password
-     *  - database
-     *  - auth database
-     */
-
     private static final String OUTPUT_PATH_ARG = "-o";
     private static final String MONGODUMP_PATH = "/mongotools/mongodump";
     private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
     private static final String MONGO_DIR = "MongoDB";
 
     private final String database;
-
-    // TODO unify as much of this as possible with PostgresBackupTask by creating an abstract parent class
 
     public MongoBackupTask(final PropertyStore propStore,
                            final String database,
