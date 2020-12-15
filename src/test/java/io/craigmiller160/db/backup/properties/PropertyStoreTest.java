@@ -56,6 +56,7 @@ public class PropertyStoreTest {
         props.setProperty(PropertyStore.EMAIL_AUTH_USER, "craig@gmail.com");
         props.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, "password");
         props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "30");
+        props.setProperty(PropertyStore.MONGODUMP_COMMAND, "mongodump");
     }
 
     @Test
