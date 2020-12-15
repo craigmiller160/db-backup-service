@@ -35,6 +35,10 @@ public class TaskFactory {
         return new PostgresCleanupTask(propStore, database, schema);
     }
 
-    // TODO add new tasks
+    public Runnable createMongoBackupTask(final PropertyStore propStore, final EmailService emailService, final String database) {
+        return new MongoBackupTask(propStore, database, emailService);
+    }
+
+    // TODO add mongo cleanup task
 
 }
