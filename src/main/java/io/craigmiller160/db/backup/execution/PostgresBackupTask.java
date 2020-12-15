@@ -25,18 +25,13 @@ import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.InputStreamReader;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class PostgresBackupTask extends AbstractBackupTask {
-
-    // TODO add a new parent directory for postgres
 
     public static final String PG_DUMP_CMD = "pg_dump";
     public static final String HOST_ARG = "-h";

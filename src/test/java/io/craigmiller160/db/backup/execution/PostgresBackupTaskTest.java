@@ -115,7 +115,8 @@ public class PostgresBackupTaskTest {
         assertEquals(expectedEnvironment, testProcessProvider.getEnvironment().get());
 
         final var outputRootDir = new File(OUTPUT_ROOT);
-        final var outputDbDir = new File(outputRootDir, DB_NAME);
+        final var postgresDir = new File(outputRootDir, PostgresBackupTask.POSTGRES_DIR);
+        final var outputDbDir = new File(postgresDir, DB_NAME);
         final var outputSchemaDir = new File(outputDbDir, SCHEMA_NAME);
         assertTrue(outputSchemaDir.exists());
 
@@ -172,8 +173,6 @@ public class PostgresBackupTaskTest {
     public void test_run_error() {
         when(process.getInputStream())
                 .thenThrow(new RuntimeException("Dying"));
-        when(process.exitValue())
-                .thenReturn(0);
 
         postgresBackupTask.run();
         final var expectedCommand = new String[] {
