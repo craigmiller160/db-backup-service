@@ -38,6 +38,11 @@ public class PropertyStoreTest {
         props.setProperty(PropertyStore.DB_POSTGRES_PORT, "100");
         props.setProperty(PropertyStore.DB_POSTGRES_USER, "user");
         props.setProperty(PropertyStore.DB_POSTGRES_PASSWORD, "password");
+        props.setProperty(PropertyStore.DB_MONGO_HOST, "mongoHost");
+        props.setProperty(PropertyStore.DB_MONGO_PORT, "200");
+        props.setProperty(PropertyStore.DB_MONGO_USER, "user2");
+        props.setProperty(PropertyStore.DB_MONGO_PASSWORD, "password2");
+        props.setProperty(PropertyStore.DB_MONGO_AUTH_DB, "authDb");
         props.setProperty(PropertyStore.EXECUTOR_THREAD_COUNT, "4");
         props.setProperty(PropertyStore.EXECUTOR_INTERVAL_SECS, "1000");
         props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, System.getProperty("user.dir"));
