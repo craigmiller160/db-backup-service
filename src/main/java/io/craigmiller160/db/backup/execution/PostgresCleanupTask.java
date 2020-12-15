@@ -75,20 +75,14 @@ public class PostgresCleanupTask implements Runnable {
                             })
                                     .map(p -> new CleanupResult(result.successCount() + 1, result.failureCount()))
                                     .recoverWith(ex -> {
-                                        log.debug(String.format("Failed to cleanup file %s for Database %s and Schema %s", path, database, schema), ex);
+                                        log.debug(String.format("Failed to cleanup Postgres file %s for Database %s and Schema %s", path, database, schema), ex);
                                         return Try.success(new CleanupResult(result.successCount(), result.failureCount() + 1));
                                     })
                                     .get()
                         )
         )
-                .onSuccess(result -> log.info("Finished cleaning up Database {} and Schema {}. Success: {} Failure: {}", database, schema, result.successCount(), result.failureCount()))
-                .onFailure(ex -> log.error(String.format("Error attempting to cleanup Database {} and Schema {}", database, schema), ex));
-    }
-
-    public static record CleanupResult(int successCount, int failureCount) {
-        public int totalCount() {
-            return successCount + failureCount;
-        }
+                .onSuccess(result -> log.info("Finished cleaning up Postgres Database {} and Schema {}. Success: {} Failure: {}", database, schema, result.successCount(), result.failureCount()))
+                .onFailure(ex -> log.error(String.format("Error attempting to cleanup Postgres Database %s and Schema %s", database, schema), ex));
     }
 
 }

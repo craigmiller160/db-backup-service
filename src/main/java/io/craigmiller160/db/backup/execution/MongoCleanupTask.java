@@ -19,11 +19,14 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import io.vavr.collection.Stream;
+import io.vavr.control.Try;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -53,7 +56,28 @@ public class MongoCleanupTask  implements Runnable {
         final var oldestAllowed = ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
                 .minusDays(propStore.getOutputCleanupAgeDays());
 
-        // TODO finish this
+        Try.of(() ->
+                Stream.ofAll(Files.list(targetDir))
+                .filter(path -> {
+                    final var fileName = path.getFileName().toString();
+                    final var timestamp = LocalDateTime.parse(fileName, BackupConstants.FORMAT).atZone(ZoneId.of(BackupConstants.TIME_ZONE));
+                    return oldestAllowed.compareTo(timestamp) > 0;
+                })
+                .foldLeft(new CleanupResult(0, 0), (result, path) ->
+                        Try.of(() -> {
+                            Files.delete(path);
+                            return path;
+                        })
+                                .map(p -> new CleanupResult(result.successCount() + 1, result.failureCount()))
+                                .recoverWith(ex -> {
+                                    log.debug(String.format("Failed to cleanup MongoDB directory %s for Database %s", path, database), ex);
+                                    return Try.success(new CleanupResult(result.successCount(), result.failureCount() + 1));
+                                })
+                                .get()
+                )
+        )
+                .onSuccess(result -> log.info("Finished cleaning up MongoDB Database {}. Success: {} Failure: {}", database, result.successCount(), result.failureCount()))
+                .onFailure(ex -> log.error(String.format("Error attempting to cleanup MongoDB Database %s", database), ex));
     }
 
 }
