@@ -126,8 +126,38 @@ public class EmailServiceTest {
     }
 
     @Test
-    public void test_sendMongoErrorAlertEmail() {
-        throw new RuntimeException();
+    public void test_sendMongoErrorAlertEmail() throws Exception {
+        final var tokenResponseDto = new TokenResponse(ACCESS_TOKEN, "", "");
+        final var tokenResponse = new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
+        final var emailResponse = new TestHttpResponse(204, "");
+        final var tokenRequest = String.format("grant_type=password&username=%s&password=%s", USER, PASSWORD);
+
+        final var emailText = String.format("%s%n%s",
+                EmailService.MONGO_ERROR_ALERT_MESSAGE.formatted(DATABASE),
+                EmailService.GENERIC_MESSAGE.formatted(NOW.format(EmailService.FORMATTER), String.format("%s - %s", EXCEPTION.getClass().getName(), EXCEPTION.getMessage()))
+        );
+        final var emailRequestDto = new EmailRequest(
+                List.of(EMAIL_TO),
+                Collections.emptyList(),
+                Collections.emptyList(),
+                EmailService.ERROR_ALERT_SUBJECT,
+                emailText
+        );
+        final var emailRequest = objectMapper.writeValueAsString(emailRequestDto);
+
+        when(httpClient.send(any(), any()))
+                .thenReturn(tokenResponse)
+                .thenReturn(emailResponse);
+
+        emailService.sendMongoErrorAlertEmail(DATABASE, EXCEPTION);
+
+        final var requestCaptor = ArgumentCaptor.forClass(HttpRequest.class);
+
+        verify(httpClient, times(2))
+                .send(requestCaptor.capture(), any());
+        assertEquals(2, requestCaptor.getAllValues().size());
+        testHttpRequest(requestCaptor.getAllValues().get(0), URI.create(String.format("%s%s", AUTH_HOST, EmailService.TOKEN_URI)), tokenRequest);
+        testHttpRequest(requestCaptor.getAllValues().get(1), URI.create(String.format("%s%s", EMAIL_HOST, EmailService.EMAIL_URI)), emailRequest);
     }
 
     private void testHttpRequest(final HttpRequest request, final URI expectedUri, final String expectedBody) {
