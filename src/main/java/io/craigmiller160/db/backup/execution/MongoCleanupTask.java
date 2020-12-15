@@ -21,6 +21,7 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ public class MongoCleanupTask  implements Runnable {
                 })
                 .foldLeft(new CleanupResult(0, 0), (result, path) ->
                         Try.of(() -> {
-                            Files.delete(path);
+                            FileUtils.deleteDirectory(path.toFile());
                             return path;
                         })
                                 .map(p -> new CleanupResult(result.successCount() + 1, result.failureCount()))

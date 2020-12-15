@@ -65,8 +65,6 @@ public class PostgresCleanupTaskTest {
         file2 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time2));
         file3 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time3));
 
-
-
         postgresCleanupTask = new PostgresCleanupTask(propStore, DB_NAME, SCHEMA_NAME);
     }
 
