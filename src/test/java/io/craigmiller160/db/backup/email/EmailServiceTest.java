@@ -91,7 +91,7 @@ public class EmailServiceTest {
     }
 
     @Test
-    public void test_sendErrorAlertEmail() throws Exception {
+    public void test_sendPostgresErrorAlertEmail() throws Exception {
         final var tokenResponseDto = new TokenResponse(ACCESS_TOKEN, "", "");
         final var tokenResponse = new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
         final var emailResponse = new TestHttpResponse(204, "");
