@@ -18,6 +18,9 @@
 
 package io.craigmiller160.db.backup.execution;
 
+import io.craigmiller160.db.backup.email.EmailService;
+import io.craigmiller160.db.backup.properties.PropertyStore;
+
 public class MongoBackupTask implements Runnable {
 
     /*
@@ -32,6 +35,29 @@ public class MongoBackupTask implements Runnable {
 
     private static final String MONGODUMP_PATH = "/mongotools/mongodump";
     private static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
+
+    private final PropertyStore propStore;
+    private final String database;
+    private final ProcessProvider processProvider;
+    private final EmailService emailService;
+
+    // TODO unify as much of this as possible with PostgresBackupTask by creating an abstract parent class
+
+    public MongoBackupTask(final PropertyStore propStore,
+                           final String database,
+                           final ProcessProvider processProvider,
+                           final EmailService emailService) {
+        this.propStore = propStore;
+        this.database = database;
+        this.processProvider = processProvider;
+        this.emailService = emailService;
+    }
+
+    public MongoBackupTask(final PropertyStore propStore,
+                           final String database,
+                           final EmailService emailService) {
+        this (propStore, database, ProcessProvider.DEFAULT, emailService);
+    }
 
     @Override
     public void run() {

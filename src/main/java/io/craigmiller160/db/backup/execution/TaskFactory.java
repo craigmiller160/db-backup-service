@@ -35,4 +35,6 @@ public class TaskFactory {
         return new PostgresCleanupTask(propStore, database, schema);
     }
 
+    // TODO add new tasks
+
 }
