@@ -48,11 +48,11 @@ public class PostgresCleanupTask implements Runnable {
 
     @Override
     public void run() {
-        log.info("Running cleanup for Database {} and Schema {}", database, schema);
+        log.info("Running cleanup for Postgres Database {} and Schema {}", database, schema);
 
-        final var schemaOutputDir = Paths.get(propStore.getOutputRootDirectory(), database, schema);
+        final var schemaOutputDir = Paths.get(propStore.getOutputRootDirectory(), PostgresBackupTask.POSTGRES_DIR, database, schema);
         if (!Files.exists(schemaOutputDir)) {
-            log.info("Directory to cleanup does not exist: {}", schemaOutputDir.toAbsolutePath().toString());
+            log.info("Directory to cleanup Postgres files does not exist: {}", schemaOutputDir.toAbsolutePath().toString());
             return;
         }
 

@@ -19,8 +19,17 @@
 package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class MongoCleanupTask  implements Runnable {
+
+    private static final Logger log = LoggerFactory.getLogger(MongoCleanupTask.class);
 
     private final PropertyStore propStore;
     private final String database;
@@ -33,6 +42,17 @@ public class MongoCleanupTask  implements Runnable {
 
     @Override
     public void run() {
+        log.info("Running cleanup for MongoDB Database {}", database);
+
+        final var targetDir = Paths.get(propStore.getOutputRootDirectory(), MongoBackupTask.MONGO_DIR, database);
+        if (!Files.exists(targetDir)) {
+            log.info("Directory to cleanup MongoDB files does not exist: {}", targetDir.toAbsolutePath().toString());
+            return;
+        }
+
+        final var oldestAllowed = ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
+                .minusDays(propStore.getOutputCleanupAgeDays());
+
         // TODO finish this
     }
 
