@@ -35,7 +35,10 @@ public class MongoBackupTask extends AbstractBackupTask {
     private static final Logger log = LoggerFactory.getLogger(MongoBackupTask.class);
 
     public static final String OUTPUT_PATH_ARG = "-o";
-    public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s&tls=true&tlsAllowInvalidHostnames=true&tlsAllowInvalidCertificates=true\"";
+    public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s&tls=true\"";
+    public static final String USE_TLS = "--ssl";
+    public static final String ALLOW_INVALID_HOSTNAMES = "--sslAllowInvalidHostnames";
+    public static final String ALLOW_INVALID_CERTS = "--sslAllowInvalidCertificates";
 
     private final String database;
 
@@ -68,6 +71,9 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var command = new String[] {
                 propStore.getMongodumpCommand(),
                 uriArg,
+                USE_TLS,
+                ALLOW_INVALID_HOSTNAMES,
+                ALLOW_INVALID_CERTS,
                 OUTPUT_PATH_ARG,
                 outputPath.toString()
         };
