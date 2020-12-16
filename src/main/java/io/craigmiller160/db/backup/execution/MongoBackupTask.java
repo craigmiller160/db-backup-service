@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MongoBackupTask extends AbstractBackupTask {
@@ -54,8 +55,6 @@ public class MongoBackupTask extends AbstractBackupTask {
 
     @Override
     public void run() {
-        log.info("Running MongoDB backup for Database {}", database);
-
         final var host = propStore.getMongoHost();
         final var port = propStore.getMongoPort();
         final var user = propStore.getMongoUser();
@@ -73,6 +72,8 @@ public class MongoBackupTask extends AbstractBackupTask {
                 outputPath.toString()
         };
         final var environment = new HashMap<String,String>();
+
+        log.debug("Running MongoDB backup for Database {} Command: {}", database, Arrays.toString(command));
 
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readProcess)

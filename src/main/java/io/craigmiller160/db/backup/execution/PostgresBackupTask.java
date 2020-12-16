@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Map;
 
 public class PostgresBackupTask extends AbstractBackupTask {
@@ -65,8 +66,6 @@ public class PostgresBackupTask extends AbstractBackupTask {
 
     @Override
     public void run() {
-        log.info("Running Postgres backup for Database {} and Schema {}", database, schema);
-
         final var command = new String[] {
                 PG_DUMP_CMD,
                 database,
@@ -81,6 +80,9 @@ public class PostgresBackupTask extends AbstractBackupTask {
                 USE_INSERT_STATEMENTS
         };
         final var environment = Map.of(PASSWORD_ENV, propStore.getPostgresPassword());
+
+        log.debug("Running Postgres backup for Database {} and Schema {} Command {}", database, schema, Arrays.toString(command));
+
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readProcess)
                 .flatMap(this::writeToFile)

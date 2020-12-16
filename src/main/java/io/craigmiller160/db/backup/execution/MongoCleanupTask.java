@@ -46,7 +46,7 @@ public class MongoCleanupTask  implements Runnable {
 
     @Override
     public void run() {
-        log.info("Running cleanup for MongoDB Database {}", database);
+        log.debug("Running cleanup for MongoDB Database {}", database);
 
         final var targetDir = Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database);
         if (!Files.exists(targetDir)) {
