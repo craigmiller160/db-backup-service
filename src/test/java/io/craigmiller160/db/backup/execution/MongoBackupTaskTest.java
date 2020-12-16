@@ -33,7 +33,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -108,6 +107,9 @@ public class MongoBackupTaskTest {
         final var expectedCommand = new String[] {
                 MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.USE_TLS,
+                MongoBackupTask.ALLOW_INVALID_HOSTNAMES,
+                MongoBackupTask.ALLOW_INVALID_CERTS,
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()
         };
@@ -135,6 +137,9 @@ public class MongoBackupTaskTest {
         final var expectedCommand = new String[] {
                 MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.USE_TLS,
+                MongoBackupTask.ALLOW_INVALID_HOSTNAMES,
+                MongoBackupTask.ALLOW_INVALID_CERTS,
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()
         };
@@ -172,6 +177,9 @@ public class MongoBackupTaskTest {
         final var expectedCommand = new String[] {
                 MONGODUMP,
                 MongoBackupTask.URI_TEMPLATE.formatted(USER, PASSWORD, HOST, Integer.parseInt(PORT), DB_NAME, AUTH_DB),
+                MongoBackupTask.USE_TLS,
+                MongoBackupTask.ALLOW_INVALID_HOSTNAMES,
+                MongoBackupTask.ALLOW_INVALID_CERTS,
                 MongoBackupTask.OUTPUT_PATH_ARG,
                 outputPath.toString()
         };
