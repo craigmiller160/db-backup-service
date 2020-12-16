@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MongoBackupTask extends AbstractBackupTask {
@@ -34,7 +35,10 @@ public class MongoBackupTask extends AbstractBackupTask {
     private static final Logger log = LoggerFactory.getLogger(MongoBackupTask.class);
 
     public static final String OUTPUT_PATH_ARG = "-o";
-    public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s\"";
+    public static final String URI_TEMPLATE = "--uri=\"mongodb://%s:%s@%s:%d/%s?authSource=%s&tls=true\"";
+    public static final String USE_TLS = "--ssl";
+    public static final String ALLOW_INVALID_HOSTNAMES = "--sslAllowInvalidHostnames";
+    public static final String ALLOW_INVALID_CERTS = "--sslAllowInvalidCertificates";
 
     private final String database;
 
@@ -54,8 +58,6 @@ public class MongoBackupTask extends AbstractBackupTask {
 
     @Override
     public void run() {
-        log.info("Running MongoDB backup for Database {}", database);
-
         final var host = propStore.getMongoHost();
         final var port = propStore.getMongoPort();
         final var user = propStore.getMongoUser();
@@ -69,10 +71,15 @@ public class MongoBackupTask extends AbstractBackupTask {
         final var command = new String[] {
                 propStore.getMongodumpCommand(),
                 uriArg,
+                USE_TLS,
+                ALLOW_INVALID_HOSTNAMES,
+                ALLOW_INVALID_CERTS,
                 OUTPUT_PATH_ARG,
                 outputPath.toString()
         };
         final var environment = new HashMap<String,String>();
+
+        log.debug("Running MongoDB backup for Database {} Command: {}", database, Arrays.toString(command));
 
         Try.of(() -> processProvider.provide(command, environment))
                 .flatMap(this::readProcess)

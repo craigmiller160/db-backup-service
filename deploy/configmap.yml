@@ -19,5 +19,6 @@ data:
   mongodump.command: /mongotools/mongodump
   db.mongo.host: mongodb-service
   db.mongo.port: "27017"
-  db.mongo.user: user
-  db.mongo.password: password
+  db.mongo.user: mongo_root
+  # TODO make this info
+  logger.application.level: debug

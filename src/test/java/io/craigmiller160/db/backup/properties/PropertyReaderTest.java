@@ -32,11 +32,13 @@ public class PropertyReaderTest {
     @AfterEach
     @ClearEnvironmentVariable(key = "db.postgres.host")
     @ClearEnvironmentVariable(key = "db.postgres.password")
+    @ClearEnvironmentVariable(key = "db.mongo.password")
     public void clean() {}
 
     @Test
     @SetEnvironmentVariable(key = "db.postgres.host", value = "TestHost")
     @SetEnvironmentVariable(key = "db.postgres.password", value = "password")
+    @SetEnvironmentVariable(key = "db.mongo.password", value = "password")
     public void test_readProperties() throws Exception {
         final var propStore = propertyReader.readProperties().get();
         assertEquals("TestHost", propStore.getPostgresHost());

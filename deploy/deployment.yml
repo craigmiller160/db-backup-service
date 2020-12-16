@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: db-backup-service
-          image: localhost:32000/db-backup-service:1.5.0-SNAPSHOT
+          image: localhost:32000/db-backup-service:1.5.0-SNAPSHOT.3
           envFrom:
             - configMapRef:
                 name: db-backup-service-configmap
@@ -24,6 +24,11 @@ spec:
                 secretKeyRef:
                   name: postgres-root-password
                   key: POSTGRES_ROOT_PASSWORD
+            - name: db.mongo.password
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-root-password
+                  key: MONGO_ROOT_PASSWORD
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
