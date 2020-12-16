@@ -24,6 +24,11 @@ spec:
                 secretKeyRef:
                   name: postgres-root-password
                   key: POSTGRES_ROOT_PASSWORD
+            - name: db.mongo.password
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-root-password
+                  key: MONGO_ROOT_PASSWORD
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
