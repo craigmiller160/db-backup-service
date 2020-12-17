@@ -29,6 +29,11 @@ spec:
                 secretKeyRef:
                   name: mongodb-root-password
                   key: MONGO_ROOT_PASSWORD
+            - name: email.auth.client-secret
+              valueFrom:
+                secretKeyRef:
+                  name: email-service-client-secret
+                  key: client-secret
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
