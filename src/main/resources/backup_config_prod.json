@@ -37,6 +37,18 @@
         "schemas": [
           "public"
         ]
+      },
+      {
+        "name": "financial_manager_dev",
+        "schemas": [
+          "public"
+        ]
+      },
+      {
+        "name": "financial_manager_prod",
+        "schemas": [
+          "public"
+        ]
       }
     ]
   },
