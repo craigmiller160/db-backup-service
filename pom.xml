@@ -6,10 +6,10 @@
 
     <groupId>io.craigmiller160</groupId>
     <artifactId>db-backup-service</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.3</version>
 
     <properties>
-        <web.utils.version>1.0.0</web.utils.version>
+        <web.utils.version>1.1.2</web.utils.version>
         <java.version>15</java.version>
         <jackson.version>2.11.3</jackson.version>
         <junit.version>5.7.0</junit.version>
