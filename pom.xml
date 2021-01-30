@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>io.craigmiller160</groupId>
-            <artifactId>web-utils</artifactId>
+            <artifactId>spring-web-utils</artifactId>
             <version>${web.utils.version}</version>
             <exclusions>
                 <exclusion>
