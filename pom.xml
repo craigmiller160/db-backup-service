@@ -6,7 +6,20 @@
 
     <groupId>io.craigmiller160</groupId>
     <artifactId>db-backup-service</artifactId>
-    <version>1.5.0-SNAPSHOT.4</version>
+    <version>1.5.0-SNAPSHOT</version>
+
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>https://craigmiller160.ddns.net:30003/repository/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>nexus</id>
+            <name>Snapshot</name>
+            <url>https://craigmiller160.ddns.net:30003/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <web.utils.version>1.1.2</web.utils.version>
@@ -165,25 +178,6 @@
                         <goals>
                             <goal>single</goal>
                         </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <configuration>
-                            <target>
-                                <ant antfile="${basedir}/deploy/build.xml" />
-                            </target>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
