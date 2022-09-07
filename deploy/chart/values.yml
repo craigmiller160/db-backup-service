@@ -4,3 +4,10 @@ app-deployment:
     image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
     configMaps:
       - db-backup-service-configmap
+    secrets:
+      - envVariable: db.postgres.user
+      - envVariable: db.postgres.password
+      - envVariable: email.auth.client-key
+      - envVariable: email.auth.client-secret
+      - envVariable: db.mongo.user
+      - envVariable: db.mongo.password

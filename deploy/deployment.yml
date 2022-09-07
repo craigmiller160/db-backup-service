@@ -37,6 +37,7 @@ spec:
           volumeMounts:
             - mountPath: /output
               name: db-backup-service-volume
+          # TODO how am I going to do this???
           livenessProbe:
             exec:
               command:
