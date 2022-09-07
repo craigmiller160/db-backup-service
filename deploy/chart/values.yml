@@ -6,8 +6,16 @@ app-deployment:
       - db-backup-service-configmap
     secrets:
       - envVariable: db.postgres.user
+        secretName: postgres-root-account
+        secretKey: username
       - envVariable: db.postgres.password
+        secretName: postgres-root-account
+        secretKey: password
       - envVariable: email.auth.client-key
+        secretName: email-service-oauth2-keys
+        secretKey: clientKey
       - envVariable: email.auth.client-secret
+        secretName: email-service-oauth2-keys
+        secretKey: clientSecret
       - envVariable: db.mongo.user
       - envVariable: db.mongo.password
