@@ -23,3 +23,8 @@ app-deployment:
       - envVariable: db.mongo.password
         secretName: mongodb-root-account
         secretKey: password
+    livenessProbe:
+      exec:
+        command:
+          - sh
+          - /output/liveness.sh
