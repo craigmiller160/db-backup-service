@@ -18,4 +18,8 @@ app-deployment:
         secretName: email-service-oauth2-keys
         secretKey: clientSecret
       - envVariable: db.mongo.user
+        secretName: mongodb-root-account
+        secretKey: username
       - envVariable: db.mongo.password
+        secretName: mongodb-root-account
+        secretKey: password
