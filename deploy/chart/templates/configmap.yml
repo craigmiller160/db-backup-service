@@ -7,8 +7,8 @@ data:
   db.postgres.port: "5432"
   config.file: backup_config_prod.json
   output.root-directory: /output
-  output.cleanup.age-days: "30"
-  executor.interval-secs: "3600"
+  output.cleanup.age-days: "10"
+  executor.interval-secs: "86400"
   email.host: https://email-service-service:8443
   email.auth.host: https://sso-oauth2-server-service.default:8443
   # TODO what are these credentials and how are they useful?
