@@ -1,0 +1,6 @@
+app-deployment:
+  appName: db-backup-service
+  deployment:
+    image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
+    configMaps:
+      - db-backup-service-configmap
