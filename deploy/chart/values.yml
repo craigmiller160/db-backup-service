@@ -30,6 +30,6 @@ app-deployment:
           - /output/liveness.sh
   volumes:
     - name: db-backup-service-volume
-      type: HostPath
+      type: PVC
       deploymentMountPath: /output
-      hostPath: /opt/kubernetes/data/db-backup-service
+#      hostPath: /opt/kubernetes/data/db-backup-service
