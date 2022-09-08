@@ -32,4 +32,3 @@ app-deployment:
     - name: db-backup-service-volume
       type: PVC
       deploymentMountPath: /output
-#      hostPath: /opt/kubernetes/data/db-backup-service
