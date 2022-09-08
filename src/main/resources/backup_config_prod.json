@@ -2,12 +2,6 @@
   "postgres": {
     "databases": [
       {
-        "name": "vm_dev",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
         "name": "vm_prod",
         "schemas": [
           "public"
@@ -21,12 +15,6 @@
         ]
       },
       {
-        "name": "funcoast_hi_dev",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
         "name": "funcoast_hi_test",
         "schemas": [
           "public"
@@ -34,18 +22,6 @@
       },
       {
         "name": "funcoast_hi_prod",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
-        "name": "financial_manager_dev",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
-        "name": "financial_manager_prod",
         "schemas": [
           "public"
         ]
