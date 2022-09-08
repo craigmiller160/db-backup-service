@@ -2,12 +2,6 @@
   "postgres": {
     "databases": [
       {
-        "name": "vm_dev",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
         "name": "vm_prod",
         "schemas": [
           "public"
@@ -16,14 +10,7 @@
       {
         "name": "oauth2_server",
         "schemas": [
-          "dev",
           "prod"
-        ]
-      },
-      {
-        "name": "funcoast_hi_dev",
-        "schemas": [
-          "public"
         ]
       },
       {
@@ -37,25 +24,13 @@
         "schemas": [
           "public"
         ]
-      },
-      {
-        "name": "financial_manager_dev",
-        "schemas": [
-          "public"
-        ]
-      },
-      {
-        "name": "financial_manager_prod",
-        "schemas": [
-          "public"
-        ]
       }
     ]
   },
   "mongodb": {
     "databases": [
       {
-        "name": "covid_19_prod"
+        "name": "market_tracker_prod"
       }
     ]
   }

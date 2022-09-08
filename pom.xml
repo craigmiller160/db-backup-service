@@ -12,18 +12,18 @@
         <repository>
             <id>nexus</id>
             <name>Releases</name>
-            <url>https://craigmiller160.ddns.net:30003/repository/maven-releases</url>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-releases</url>
         </repository>
         <snapshotRepository>
             <id>nexus</id>
             <name>Snapshot</name>
-            <url>https://craigmiller160.ddns.net:30003/repository/maven-snapshots</url>
+            <url>https://nexus-craigmiller160.ddns.net/repository/maven-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
     <properties>
         <web.utils.version>1.1.2</web.utils.version>
-        <java.version>15</java.version>
+        <java.version>18</java.version>
         <jackson.version>2.11.3</jackson.version>
         <junit.version>5.7.0</junit.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -144,7 +144,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
                 </configuration>
             </plugin>
             <plugin>
@@ -152,7 +151,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <argLine>--enable-preview</argLine>
+                    <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
             </plugin>
             <plugin>
