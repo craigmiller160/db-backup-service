@@ -40,5 +40,7 @@ There is a file, `backup_config_prod.json`, in the root of the resources directo
 1. Run this command:
 
 ```
-psql -h localhost -p 30001 -U postgres_root oauth2_server < backup_20201213171523.sql
+psql -h postgres.infra-prod -U postgres_root oauth2_server -f backup_20201213171523.sql
 ```
+
+NOTE: The above command should be tweaked and run from the db-backup-service pod, it's easier that way 
