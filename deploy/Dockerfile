@@ -10,4 +10,4 @@ COPY mongotools/mongodump /mongotools
 
 COPY build/db-backup-service-*.jar /db-backup-service.jar
 
-ENTRYPOINT ["java", "-jar", "--enable-preview", "db-backup-service.jar"]
+ENTRYPOINT ["java", "-jar", "db-backup-service.jar"]
