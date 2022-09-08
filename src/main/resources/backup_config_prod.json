@@ -10,7 +10,6 @@
       {
         "name": "oauth2_server",
         "schemas": [
-          "dev",
           "prod"
         ]
       },
@@ -31,7 +30,7 @@
   "mongodb": {
     "databases": [
       {
-        "name": "covid_19_prod"
+        "name": "market_tracker_prod"
       }
     ]
   }
