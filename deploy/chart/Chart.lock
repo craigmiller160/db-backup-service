@@ -1,6 +1,0 @@
-dependencies:
-- name: app-deployment
-  repository: https://nexus-craigmiller160.ddns.net/repository/helm-private
-  version: 0.1.0
-digest: sha256:3ef46612ae03c848c3a4338c4f3dee91bb9f5c3aecb88f4af2126f8469746773
-generated: "2022-09-07T22:32:31.049636-04:00"
