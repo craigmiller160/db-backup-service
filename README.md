@@ -34,13 +34,12 @@ There is a file, `backup_config_prod.json`, in the root of the resources directo
 
 ## How To Restore Backup
 
-1. Delete the existing schema, if it still exists.
-1. If the database doesn't exist (ie, DB wipe), create it.
-1. Identify the file to add. Make sure the ownership settings for it are good. (Optional)
-1. Run this command:
+### Postgres
 
-```
-psql -h postgres.infra-prod -U postgres_root oauth2_server -f backup_20201213171523.sql
-```
+First, you want to open a shell in the `db-backup-service` pod and navigate to the `/output` directory to find all the backups. This is because all the CLI tools for restoration are already installed here and Postgres is easily accessible.
 
-NOTE: The above command should be tweaked and run from the db-backup-service pod, it's easier that way 
+Then, find the file you want and run this command:
+
+```bash
+psql -h postgres.infra-prod -U postgres_root {database name} -f {backup file}
+```
