@@ -42,3 +42,15 @@ There is a file, `backup_config_prod.json`, in the root of the resources directo
 ```
 psql -h localhost -p 30001 -U postgres_root oauth2_server < backup_20201213171523.sql
 ```
+
+### MongoDB
+
+First, you want to open a shell in the `db-backup-service` pod and navigate to the `/output` directory to find all the backups. This is because all the CLI tools for restoration are already installed here and MongoDB is easily accessible.
+
+Second, these backups are arranged as directories with a timestamp, not files with a timestamp. The whole directory is needed.
+
+Now, just run the command on the backup you want:
+
+```bash
+
+```
