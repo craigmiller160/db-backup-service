@@ -53,5 +53,5 @@ Second, these backups are arranged as directories with a timestamp, not files wi
 Now, just run the command on the backup you want:
 
 ```bash
-
+mongorestore --uri="mongodb://mongodb.infra-prod:27017/admin?authSource=admin&tls=true" --username={username} --password={password} --tlsInsecure {direcotry}
 ```
