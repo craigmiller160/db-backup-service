@@ -7,6 +7,7 @@ RUN apt install postgresql-client-12 -y
 
 RUN mkdir /mongotools
 COPY mongotools/* /mongotools
+ENV PATH="/mongotools:${PATH}"
 
 COPY build/db-backup-service-*.jar /db-backup-service.jar
 
