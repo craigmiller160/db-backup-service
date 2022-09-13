@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: db-backup-service-configmap
 data:
-  db.postgres.host: postgres-service.default
+  db.postgres.host: postgres.infra-prod
   db.postgres.port: "5432"
   config.file: backup_config_prod.json
   output.root-directory: /output
@@ -15,6 +15,6 @@ data:
   email.auth.user: dbBackupService@gmail.com
   email.auth.password: db-backup-service-2020
   mongodump.command: /mongotools/mongodump
-  db.mongo.host: mongodb-service.default
+  db.mongo.host: mongodb.infra-prod
   db.mongo.port: "27017"
   logger.application.level: info
