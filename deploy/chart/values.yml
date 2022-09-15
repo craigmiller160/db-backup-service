@@ -1,33 +1,32 @@
 app-deployment:
   appName: db-backup-service
-  deployment:
-    image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
-    configMaps:
-      - db-backup-service-configmap
-    secrets:
-      - envVariable: db.postgres.user
-        secretName: postgres-root-account
-        secretKey: username
-      - envVariable: db.postgres.password
-        secretName: postgres-root-account
-        secretKey: password
-      - envVariable: email.auth.client-key
-        secretName: email-service-oauth2-keys
-        secretKey: clientKey
-      - envVariable: email.auth.client-secret
-        secretName: email-service-oauth2-keys
-        secretKey: clientSecret
-      - envVariable: db.mongo.user
-        secretName: mongodb-root-account
-        secretKey: username
-      - envVariable: db.mongo.password
-        secretName: mongodb-root-account
-        secretKey: password
-    livenessProbe:
-      exec:
-        command:
-          - sh
-          - /output/liveness.sh
+  image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
+  configMaps:
+    - db-backup-service-configmap
+  secrets:
+    - envVariable: db.postgres.user
+      secretName: postgres-root-account
+      secretKey: username
+    - envVariable: db.postgres.password
+      secretName: postgres-root-account
+      secretKey: password
+    - envVariable: email.auth.client-key
+      secretName: email-service-oauth2-keys
+      secretKey: clientKey
+    - envVariable: email.auth.client-secret
+      secretName: email-service-oauth2-keys
+      secretKey: clientSecret
+    - envVariable: db.mongo.user
+      secretName: mongodb-root-account
+      secretKey: username
+    - envVariable: db.mongo.password
+      secretName: mongodb-root-account
+      secretKey: password
+  livenessProbe:
+    exec:
+      command:
+        - sh
+        - /output/liveness.sh
   volumes:
     - name: db-backup-service-volume
       type: PVC
