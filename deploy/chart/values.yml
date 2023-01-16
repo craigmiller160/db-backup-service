@@ -1,8 +1,19 @@
 app_deployment:
   appName: db-backup-service
   image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
-  configMaps:
-    - db-backup-service-configmap
+  configMap:
+    db.postgres.host: postgres.infra-prod
+    db.postgres.port: "5432"
+    config.file: backup_config_prod.json
+    output.root-directory: /output
+    output.cleanup.age-days: "10"
+    executor.interval-secs: "86400"
+    email.host: https://email-service:8443
+    email.auth.host: https://sso-oauth2-server:8443
+    mongodump.command: /mongotools/mongodump
+    db.mongo.host: mongodb.infra-prod
+    db.mongo.port: "27017"
+    logger.application.level: info
   onepassworditems:
     - name: db-backup-service-email-service-oauth2-keys
       itemPath: vaults/Home Server (Prod)/items/Email Service OAuth2 Keys

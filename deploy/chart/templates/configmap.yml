@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: db-backup-service-configmap
+  name: db-backup-service-configmap-deprecated
 data:
   db.postgres.host: postgres.infra-prod
   db.postgres.port: "5432"
