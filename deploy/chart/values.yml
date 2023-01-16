@@ -3,24 +3,31 @@ app_deployment:
   image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
   configMaps:
     - db-backup-service-configmap
+  onepassworditems:
+    - name: db-backup-service-email-service-oauth2-keys
+      itemPath: vaults/Home Server (Prod)/items/Email Service OAuth2 Keys
+    - name: db-backup-service-postgres
+      itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
+    - name: db-backup-service-mongodb
+      itemPath: vaults/Home Server (Prod)/items/MongoDB Root Account
   secrets:
     - envVariable: db.postgres.user
-      secretName: postgres-root-account
+      secretName: db-backup-service-postgres
       secretKey: username
     - envVariable: db.postgres.password
-      secretName: postgres-root-account
+      secretName: db-backup-service-postgres
       secretKey: password
     - envVariable: email.auth.client-key
-      secretName: email-service-oauth2-keys
+      secretName: db-backup-service-email-service-oauth2-keys
       secretKey: clientKey
     - envVariable: email.auth.client-secret
-      secretName: email-service-oauth2-keys
+      secretName: db-backup-service-email-service-oauth2-keys
       secretKey: clientSecret
     - envVariable: db.mongo.user
-      secretName: mongodb-root-account
+      secretName: db-backup-service-mongodb
       secretKey: username
     - envVariable: db.mongo.password
-      secretName: mongodb-root-account
+      secretName: db-backup-service-mongodb
       secretKey: password
   commonProbe:
     exec:
