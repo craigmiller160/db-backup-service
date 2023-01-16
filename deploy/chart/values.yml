@@ -1,4 +1,4 @@
-app-deployment:
+app_deployment:
   appName: db-backup-service
   image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
   configMaps:
@@ -22,7 +22,7 @@ app-deployment:
     - envVariable: db.mongo.password
       secretName: mongodb-root-account
       secretKey: password
-  livenessProbe:
+  commonProbe:
     exec:
       command:
         - sh
