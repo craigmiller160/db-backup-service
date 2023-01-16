@@ -22,7 +22,7 @@
     </distributionManagement>
 
     <properties>
-        <web.utils.version>1.1.2</web.utils.version>
+        <web.utils.version>1.1.4</web.utils.version>
         <java.version>18</java.version>
         <jackson.version>2.11.3</jackson.version>
         <junit.version>5.7.0</junit.version>

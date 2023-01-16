@@ -1,33 +1,52 @@
-app-deployment:
+app_deployment:
   appName: db-backup-service
   image: nexus-docker-craigmiller160.ddns.net/db-backup-service:latest
-  configMaps:
-    - db-backup-service-configmap
+  configMap:
+    db.postgres.host: postgres.infra-prod
+    db.postgres.port: "5432"
+    config.file: backup_config_prod.json
+    output.root-directory: /output
+    output.cleanup.age-days: "10"
+    executor.interval-secs: "86400"
+    email.host: https://email-service:8443
+    email.auth.host: https://sso-oauth2-server:8443
+    mongodump.command: /mongotools/mongodump
+    db.mongo.host: mongodb.infra-prod
+    db.mongo.port: "27017"
+    logger.application.level: info
+  onepassworditems:
+    - name: db-backup-service-email-service-oauth2-keys
+      itemPath: vaults/Home Server (Prod)/items/Email Service OAuth2 Keys
+    - name: db-backup-service-postgres
+      itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
+    - name: db-backup-service-mongodb
+      itemPath: vaults/Home Server (Prod)/items/MongoDB Root Account
   secrets:
     - envVariable: db.postgres.user
-      secretName: postgres-root-account
+      secretName: db-backup-service-postgres
       secretKey: username
     - envVariable: db.postgres.password
-      secretName: postgres-root-account
+      secretName: db-backup-service-postgres
       secretKey: password
     - envVariable: email.auth.client-key
-      secretName: email-service-oauth2-keys
+      secretName: db-backup-service-email-service-oauth2-keys
       secretKey: clientKey
     - envVariable: email.auth.client-secret
-      secretName: email-service-oauth2-keys
+      secretName: db-backup-service-email-service-oauth2-keys
       secretKey: clientSecret
     - envVariable: db.mongo.user
-      secretName: mongodb-root-account
+      secretName: db-backup-service-mongodb
       secretKey: username
     - envVariable: db.mongo.password
-      secretName: mongodb-root-account
+      secretName: db-backup-service-mongodb
       secretKey: password
-  livenessProbe:
+  commonProbe:
     exec:
       command:
         - sh
         - /output/liveness.sh
   volumes:
     - name: db-backup-service-volume
-      type: PVC
+      type: HostPath
+      hostPath: /home/craig/OtherDrive/DbBackup
       deploymentMountPath: /output

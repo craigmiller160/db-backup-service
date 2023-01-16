@@ -4,3 +4,4 @@ target
 *.iml
 deploy/build
 deploy/chart/charts
+*.tgz
