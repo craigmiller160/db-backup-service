@@ -6,7 +6,7 @@
 
     <groupId>io.craigmiller160</groupId>
     <artifactId>db-backup-service</artifactId>
-    <version>1.4.10</version>
+    <version>1.4.11</version>
 
     <distributionManagement>
         <repository>
