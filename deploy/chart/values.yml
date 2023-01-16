@@ -29,5 +29,6 @@ app_deployment:
         - /output/liveness.sh
   volumes:
     - name: db-backup-service-volume
-      type: PVC
+      type: HostPath
+      hostPath: /home/craig/OtherDrive/DbBackup
       deploymentMountPath: /output
