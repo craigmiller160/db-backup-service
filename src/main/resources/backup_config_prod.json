@@ -24,6 +24,12 @@
         "schemas": [
           "public"
         ]
+      },
+      {
+        "name": "expense_tracker_prod",
+        "schemas": [
+          "public"
+        ]
       }
     ]
   },
