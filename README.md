@@ -6,6 +6,15 @@ An application to run and automatically backup data from databases in the Kubern
 
 This application will run on a set interval and run `pg_dump` commands against the Postgres database, creating an archive of database backup files in a destination directory.
 
+## Terraform Environment Variables
+
+For the Terraform script to run, the following environment variables must be present on the machine.
+
+```
+# The operator access token for communicating with 1Password
+ONEPASSWORD_TOKEN=XXXXXXX
+```
+
 ## Setting Up Development Environment
 
 This requires `pg_dump` to be available on the host system. To install it, run this command:
@@ -20,13 +29,13 @@ This also requires `mongodump` to be available. The binary for it is in the `dep
 
 Use IntelliJ to run the `Runner.java` file.
 
-If the goal is to test the error alerts, the applications `sso-oauth2-server` and `email-service` must be running locally as well.
+If the goal is to test the error alerts, the `email-service` must be running locally as well.
 
 ## Deploying to Production
 
-First, an output directory needs to be configured on the local filesystem. The Kubernetes volume will point to `/opt/kubernetes/data/db-backup-service`, however that path should be symlinked so that it points to an external hard drive. That way the data is written to a place that will not be affected if the hard drive with the OS needs to be wiped/reinstalled.
+First, an output directory needs to be configured on the local filesystem. The Kubernetes volume will point to `/home/craig/OtherDrive/DbBackup`.
 
-Now, fully build the application with `mvn clean package`. Then, run `kube-deploy` to use the deployment program to deploy the artifact.
+Then, just use `craig-build`.
 
 ## Adding Databases/Schemas to Backup
 
