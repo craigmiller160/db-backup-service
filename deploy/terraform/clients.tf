@@ -50,7 +50,7 @@ resource "keycloak_role" "db_backup_service_access_role_prod" {
   name = local.access_role_common.name
 }
 
-# TODO finish this
+# TODO finish this and explore ways to run it without email service setup yet
 
 data "keycloak_openid_client" "email_service_client_dev" {
   realm_id = data.keycloak_realm.apps_dev.id
