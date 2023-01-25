@@ -45,11 +45,9 @@ public class PropertyStore {
     public static final String EMAIL_HOST = "email.host";
     public static final String EMAIL_TO = "email.to";
     public static final String EMAIL_CONNECT_TIMEOUT_SECS = "email.connect-timeout-secs";
-    public static final String EMAIL_AUTH_HOST = "email.auth.host";
-    public static final String EMAIL_AUTH_CLIENT_KEY = "email.auth.client-key"; // TODO delete
-    public static final String EMAIL_AUTH_CLIENT_SECRET = "email.auth.client-secret"; // TODO delete
-    public static final String EMAIL_AUTH_USER = "email.auth.user";
-    public static final String EMAIL_AUTH_PASSWORD = "email.auth.password";
+    public static final String AUTH_HOST = "auth.host";
+    public static final String AUTH_CLIENT_KEY = "auth.client-key";
+    public static final String AUTH_CLIENT_SECRET = "auth.client-secret";
     public static final String OUTPUT_CLEANUP_AGE_DAYS = "output.cleanup.age-days";
     public static final String MONGODUMP_COMMAND = "mongodump.command";
 
