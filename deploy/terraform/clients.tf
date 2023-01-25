@@ -52,12 +52,38 @@ resource "keycloak_role" "db_backup_service_access_role_prod" {
 
 # TODO finish this
 
-data "keycloak_client" "email_service_client_dev" {
+data "keycloak_openid_client" "email_service_client_dev" {
   realm_id = data.keycloak_realm.apps_dev.id
+  client_id = "email-service"
+}
+
+data "keycloak_openid_client" "email_service_client_prod" {
+  realm_id = data.keycloak_realm.apps_prod.id
+  client_id = "email-service"
 }
 
 data "keycloak_role" "email_service_access_role_dev" {
   realm_id = data.keycloak_realm.apps_dev.id
-  client_id = data.keycloak_client.email_service_client_dev.id
+  client_id = data.keycloak_openid_client.email_service_client_dev.id
   name = local.access_role_common.name
+}
+
+data "keycloak_role" "email_service_access_role_prod" {
+  realm_id = data.keycloak_realm.apps_prod.id
+  client_id = data.keycloak_openid_client.email_service_client_prod.id
+  name = local.access_role_common.name
+}
+
+resource "keycloak_openid_client_service_account_role" "db_backup_service_email_service_access_dev" {
+  realm_id = data.keycloak_realm.apps_dev.id
+  service_account_user_id = keycloak_openid_client.db_backup_service_dev.service_account_user_id
+  client_id = data.keycloak_openid_client.email_service_client_dev.id
+  role = local.access_role_common.name
+}
+
+resource "keycloak_openid_client_service_account_role" "db_backup_service_email_service_access_prod" {
+  realm_id = data.keycloak_realm.apps_prod.id
+  service_account_user_id = keycloak_openid_client.db_backup_service_prod.service_account_user_id
+  client_id = data.keycloak_openid_client.email_service_client_prod.id
+  role = local.access_role_common.name
 }
