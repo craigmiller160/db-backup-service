@@ -80,11 +80,9 @@ public class EmailServiceTest {
     properties.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "30");
     properties.setProperty(PropertyStore.EMAIL_TO, EMAIL_TO);
     properties.setProperty(PropertyStore.EMAIL_HOST, EMAIL_HOST);
-    properties.setProperty(PropertyStore.EMAIL_AUTH_HOST, AUTH_HOST);
-    properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, AUTH_EMAIL_CLIENT_KEY);
-    properties.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
-    properties.setProperty(PropertyStore.EMAIL_AUTH_USER, USER);
-    properties.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, PASSWORD);
+    properties.setProperty(PropertyStore.AUTH_HOST, AUTH_HOST);
+    properties.setProperty(PropertyStore.AUTH_CLIENT_ID, AUTH_EMAIL_CLIENT_KEY);
+    properties.setProperty(PropertyStore.AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
     propStore = new PropertyStore(properties);
     emailService = new TestEmailService(propStore, () -> httpClient);
   }
