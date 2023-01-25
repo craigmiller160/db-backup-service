@@ -93,8 +93,7 @@ public class EmailServiceTest {
     final var tokenResponse =
         new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
     final var emailResponse = new TestHttpResponse(204, "");
-    final var tokenRequest =
-        String.format("grant_type=password&username=%s&password=%s", USER, PASSWORD);
+    final var tokenRequest = "grant_type=client_credentials";
 
     final var emailText =
         String.format(
@@ -136,8 +135,7 @@ public class EmailServiceTest {
     final var tokenResponse =
         new TestHttpResponse(200, objectMapper.writeValueAsString(tokenResponseDto));
     final var emailResponse = new TestHttpResponse(204, "");
-    final var tokenRequest =
-        String.format("grant_type=password&username=%s&password=%s", USER, PASSWORD);
+    final var tokenRequest = "grant_type=client_credentials";
 
     final var emailText =
         String.format(
