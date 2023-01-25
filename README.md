@@ -27,7 +27,7 @@ This also requires `mongodump` to be available. The binary for it is in the `dep
 
 ## Running in Development
 
-Use IntelliJ to run the `Runner.java` file.
+Use the `run.sh` script.
 
 If the goal is to test the error alerts, the `email-service` must be running locally as well.
 
