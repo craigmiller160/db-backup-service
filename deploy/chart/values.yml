@@ -15,8 +15,6 @@ app_deployment:
     db.mongo.port: "27017"
     logger.application.level: info
   onepassworditems:
-    - name: db-backup-service-email-service-oauth2-keys
-      itemPath: vaults/Home Server (Prod)/items/Email Service OAuth2 Keys
     - name: db-backup-service-postgres
       itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
     - name: db-backup-service-mongodb
@@ -28,12 +26,6 @@ app_deployment:
     - envVariable: db.postgres.password
       secretName: db-backup-service-postgres
       secretKey: password
-    - envVariable: email.auth.client-key
-      secretName: db-backup-service-email-service-oauth2-keys
-      secretKey: clientKey
-    - envVariable: email.auth.client-secret
-      secretName: db-backup-service-email-service-oauth2-keys
-      secretKey: clientSecret
     - envVariable: db.mongo.user
       secretName: db-backup-service-mongodb
       secretKey: username
