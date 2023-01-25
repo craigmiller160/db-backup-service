@@ -49,11 +49,9 @@ public class PropertyStoreTest {
     props.setProperty(PropertyStore.EMAIL_HOST, "https://localhost:7100");
     props.setProperty(PropertyStore.EMAIL_TO, "craig@gmail.com");
     props.setProperty(PropertyStore.EMAIL_CONNECT_TIMEOUT_SECS, "12");
-    props.setProperty(PropertyStore.EMAIL_AUTH_HOST, "https://localhost:7003");
-    props.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_KEY, "ABC");
-    props.setProperty(PropertyStore.EMAIL_AUTH_CLIENT_SECRET, "DEF");
-    props.setProperty(PropertyStore.EMAIL_AUTH_USER, "craig@gmail.com");
-    props.setProperty(PropertyStore.EMAIL_AUTH_PASSWORD, "password");
+    props.setProperty(PropertyStore.AUTH_HOST, "https://localhost:7003");
+    props.setProperty(PropertyStore.AUTH_CLIENT_ID, "ABC");
+    props.setProperty(PropertyStore.AUTH_CLIENT_SECRET, "DEF");
     props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "30");
     props.setProperty(PropertyStore.MONGODUMP_COMMAND, "mongodump");
   }
