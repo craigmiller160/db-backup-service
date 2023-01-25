@@ -46,7 +46,7 @@ public class PropertyStore {
     public static final String EMAIL_TO = "email.to";
     public static final String EMAIL_CONNECT_TIMEOUT_SECS = "email.connect-timeout-secs";
     public static final String AUTH_HOST = "auth.host";
-    public static final String AUTH_CLIENT_KEY = "auth.client-key";
+    public static final String AUTH_CLIENT_ID = "auth.client-id";
     public static final String AUTH_CLIENT_SECRET = "auth.client-secret";
     public static final String OUTPUT_CLEANUP_AGE_DAYS = "output.cleanup.age-days";
     public static final String MONGODUMP_COMMAND = "mongodump.command";
@@ -69,11 +69,9 @@ public class PropertyStore {
                     Tuple.of(EMAIL_HOST, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_TO, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(EMAIL_CONNECT_TIMEOUT_SECS, PropertyValidator.IS_NUMERIC),
-                    Tuple.of(EMAIL_AUTH_HOST, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(EMAIL_AUTH_CLIENT_KEY, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(EMAIL_AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(EMAIL_AUTH_USER, PropertyValidator.IS_NOT_BLANK),
-                    Tuple.of(EMAIL_AUTH_PASSWORD, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(AUTH_HOST, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(AUTH_CLIENT_ID, PropertyValidator.IS_NOT_BLANK),
+                    Tuple.of(AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
                     Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC),
                     Tuple.of(MONGODUMP_COMMAND, PropertyValidator.IS_NOT_BLANK)
             );
@@ -142,24 +140,16 @@ public class PropertyStore {
         return Integer.parseInt(props.getProperty(EMAIL_CONNECT_TIMEOUT_SECS));
     }
 
-    public String getEmailAuthHost() {
-        return props.getProperty(EMAIL_AUTH_HOST);
+    public String getAuthHost() {
+        return props.getProperty(AUTH_HOST);
     }
 
-    public String getEmailAuthClientKey() {
-        return props.getProperty(EMAIL_AUTH_CLIENT_KEY);
+    public String getAuthClientId() {
+        return props.getProperty(AUTH_CLIENT_ID);
     }
 
-    public String getEmailAuthClientSecret() {
-        return props.getProperty(EMAIL_AUTH_CLIENT_SECRET);
-    }
-
-    public String getEmailAuthUser() {
-        return props.getProperty(EMAIL_AUTH_USER);
-    }
-
-    public String getEmailAuthPassword() {
-        return props.getProperty(EMAIL_AUTH_PASSWORD);
+    public String getAuthClientSecret() {
+        return props.getProperty(AUTH_CLIENT_SECRET);
     }
 
     public int getOutputCleanupAgeDays() {

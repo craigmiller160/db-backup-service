@@ -175,11 +175,11 @@ public class EmailService {
                     return accessToken;
                 }
 
-                final var rawBasicAuth = String.format("%s:%s", propStore.getEmailAuthClientKey(), propStore.getEmailAuthClientSecret());
+                final var rawBasicAuth = String.format("%s:%s", propStore.getAuthClientId(), propStore.getAuthClientSecret());
                 final var encodedBasicAuth = Base64.getEncoder().encodeToString(rawBasicAuth.getBytes());
                 final var formBody = String.format("grant_type=password&username=%s&password=%s", propStore.getEmailAuthUser(), propStore.getEmailAuthPassword());
                 final var httpRequest = HttpRequest.newBuilder()
-                        .uri(URI.create(String.format("%s%s", propStore.getEmailAuthHost(), TOKEN_URI)))
+                        .uri(URI.create(String.format("%s%s", propStore.getAuthHost(), TOKEN_URI)))
                         .POST(HttpRequest.BodyPublishers.ofString(formBody))
                         .header("Content-Type", "application/x-www-form-urlencoded")
                         .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
