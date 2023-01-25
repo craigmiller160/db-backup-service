@@ -4,7 +4,7 @@ An application to run and automatically backup data from databases in the Kubern
 
 ## Overview
 
-This application will run on a set interval and run `pg_dump` commands against the Postgres database, creating an archive of database backup files in a destination directory.
+This application will run on a set interval and execute database backups.
 
 ## Terraform Environment Variables
 
