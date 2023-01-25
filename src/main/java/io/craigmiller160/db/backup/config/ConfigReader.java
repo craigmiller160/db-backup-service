@@ -28,20 +28,22 @@ import org.slf4j.LoggerFactory;
 
 public class ConfigReader {
 
-    private static final Logger log = LoggerFactory.getLogger(ConfigReader.class);
-    private final ObjectMapper mapper = new ObjectMapper();
+  private static final Logger log = LoggerFactory.getLogger(ConfigReader.class);
+  private final ObjectMapper mapper = new ObjectMapper();
 
-    private final PropertyStore propStore;
+  private final PropertyStore propStore;
 
-    public ConfigReader(final PropertyStore propStore) {
-        this.propStore = propStore;
-    }
+  public ConfigReader(final PropertyStore propStore) {
+    this.propStore = propStore;
+  }
 
-    public Try<BackupConfig> readBackupConfig() {
-        log.info("Reading Backup Configuration");
-        return Try.withResources(() -> ConfigReader.class.getClassLoader().getResourceAsStream(propStore.getConfigFile()))
-                .of(configStream -> mapper.readValue(configStream, BackupConfig.class))
-                .recoverWith(ex -> Try.failure(new ConfigReadException("Error reading configuration file", ex)));
-    }
-
+  public Try<BackupConfig> readBackupConfig() {
+    log.info("Reading Backup Configuration");
+    return Try.withResources(
+            () ->
+                ConfigReader.class.getClassLoader().getResourceAsStream(propStore.getConfigFile()))
+        .of(configStream -> mapper.readValue(configStream, BackupConfig.class))
+        .recoverWith(
+            ex -> Try.failure(new ConfigReadException("Error reading configuration file", ex)));
+  }
 }
