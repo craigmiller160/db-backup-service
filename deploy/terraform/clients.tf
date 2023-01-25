@@ -49,3 +49,15 @@ resource "keycloak_role" "db_backup_service_access_role_prod" {
   client_id = keycloak_openid_client.db_backup_service_prod.id
   name = local.access_role_common.name
 }
+
+# TODO finish this
+
+data "keycloak_client" "email_service_client_dev" {
+  realm_id = data.keycloak_realm.apps_dev.id
+}
+
+data "keycloak_role" "email_service_access_role_dev" {
+  realm_id = data.keycloak_realm.apps_dev.id
+  client_id = data.keycloak_client.email_service_client_dev.id
+  name = local.access_role_common.name
+}
