@@ -35,6 +35,9 @@
         <commons.lang.verison>3.11</commons.lang.verison>
         <hamcrest.version>2.2</hamcrest.version>
         <org.json.version>20201115</org.json.version>
+        <spotless.version>2.26.0</spotless.version>
+        <maven.git.hooks.version>1.0.1</maven.git.hooks.version>
+        <git.hooks.plugin.version>3.3.0</git.hooks.plugin.version>
     </properties>
 
     <dependencies>
@@ -195,6 +198,48 @@
                 <executions>
                     <execution>
                         <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.rudikershaw.gitbuildhook</groupId>
+                <artifactId>git-build-hook-maven-plugin</artifactId>
+                <version>${git.hooks.plugin.version}</version>
+                <configuration>
+                    <installHooks>
+                        <pre-commit>spotless-apply</pre-commit>
+                    </installHooks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>install</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>io.craigmiller160</groupId>
+                        <artifactId>maven-git-hooks</artifactId>
+                        <version>${maven.git.hooks.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <java>
+                        <googleJavaFormat />
+                    </java>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>apply</goal>
                             <goal>check</goal>
                         </goals>
                     </execution>
