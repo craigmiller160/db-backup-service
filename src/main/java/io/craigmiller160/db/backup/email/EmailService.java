@@ -216,10 +216,7 @@ public class EmailService {
                     "%s:%s", propStore.getAuthClientId(), propStore.getAuthClientSecret());
             final var encodedBasicAuth =
                 Base64.getEncoder().encodeToString(rawBasicAuth.getBytes());
-            final var formBody =
-                String.format(
-                    "grant_type=password&username=%s&password=%s",
-                    propStore.getEmailAuthUser(), propStore.getEmailAuthPassword());
+            final var formBody = "grant_type=client_credentials";
             final var httpRequest =
                 HttpRequest.newBuilder()
                     .uri(URI.create(String.format("%s%s", propStore.getAuthHost(), TOKEN_URI)))
