@@ -18,33 +18,32 @@
 
 package io.craigmiller160.db.backup.properties;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class PropertyReaderTest {
 
-    private final PropertyReader propertyReader = new PropertyReader();
+  private final PropertyReader propertyReader = new PropertyReader();
 
-    @AfterEach
-    @ClearEnvironmentVariable(key = "db.postgres.host")
-    @ClearEnvironmentVariable(key = "db.postgres.password")
-    @ClearEnvironmentVariable(key = "db.mongo.password")
-    public void clean() {}
+  @AfterEach
+  @ClearEnvironmentVariable(key = "db.postgres.host")
+  @ClearEnvironmentVariable(key = "db.postgres.password")
+  @ClearEnvironmentVariable(key = "db.mongo.password")
+  public void clean() {}
 
-    @Test
-    @SetEnvironmentVariable(key = "db.postgres.host", value = "TestHost")
-    @SetEnvironmentVariable(key = "db.postgres.password", value = "password")
-    @SetEnvironmentVariable(key = "db.mongo.password", value = "password")
-    public void test_readProperties() throws Exception {
-        final var propStore = propertyReader.readProperties().get();
-        assertEquals("TestHost", propStore.getPostgresHost());
-        assertEquals("30001", propStore.getPostgresPort());
-        assertEquals("postgres_root", propStore.getPostgresUser());
-        assertEquals("password", propStore.getPostgresPassword());
-    }
-
+  @Test
+  @SetEnvironmentVariable(key = "db.postgres.host", value = "TestHost")
+  @SetEnvironmentVariable(key = "db.postgres.password", value = "password22")
+  @SetEnvironmentVariable(key = "db.mongo.password", value = "password22")
+  public void test_readProperties() throws Exception {
+    final var propStore = propertyReader.readProperties().get();
+    assertEquals("TestHost", propStore.getPostgresHost());
+    assertEquals("5432", propStore.getPostgresPort());
+    assertEquals("postgres", propStore.getPostgresUser());
+    assertEquals("password22", propStore.getPostgresPassword());
+  }
 }

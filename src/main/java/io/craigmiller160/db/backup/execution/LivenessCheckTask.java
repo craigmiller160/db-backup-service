@@ -20,25 +20,25 @@ package io.craigmiller160.db.backup.execution;
 
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.control.Try;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LivenessCheckTask implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(LivenessCheckTask.class);
+  private static final Logger log = LoggerFactory.getLogger(LivenessCheckTask.class);
 
-    public static final String LIVENESS_SCRIPT_FILE = "liveness.sh";
-    private static final String LIVENESS_SCRIPT_TEMPLATE = """
+  public static final String LIVENESS_SCRIPT_FILE = "liveness.sh";
+  private static final String LIVENESS_SCRIPT_TEMPLATE =
+      """
             #!/bin/sh
-            
+
             current_timestamp=$(date +%%s%%3N)
             max_timestamp=%d
-            
+
             if [ $current_timestamp -gt $max_timestamp ]; then
                 exit 1
             else
@@ -46,42 +46,43 @@ public class LivenessCheckTask implements Runnable {
             fi
             """;
 
-    private final PropertyStore propStore;
+  private final PropertyStore propStore;
 
-    public LivenessCheckTask(final PropertyStore propStore) {
-        this.propStore = propStore;
+  public LivenessCheckTask(final PropertyStore propStore) {
+    this.propStore = propStore;
+  }
+
+  @Override
+  public void run() {
+    log.debug("Updating liveness check script");
+
+    final var maxTimestamp =
+        nowUtc().plusSeconds(propStore.getExecutorIntervalSecs() * 2).toInstant().toEpochMilli();
+
+    final var script = LIVENESS_SCRIPT_TEMPLATE.formatted(maxTimestamp);
+    final var outputDir = new File(propStore.getOutputRootDirectory());
+
+    if (!outputDir.exists() && !outputDir.mkdirs()) {
+      log.error(
+          String.format(
+              "Unable to write liveness script file because Output Directory cannot be created: %s",
+              propStore.getOutputRootDirectory()));
+      return;
     }
 
-    @Override
-    public void run() {
-        log.debug("Updating liveness check script");
+    final var livenessFile = new File(outputDir, LIVENESS_SCRIPT_FILE);
 
-        final var maxTimestamp = nowUtc()
-                .plusSeconds(propStore.getExecutorIntervalSecs() * 2)
-                .toInstant()
-                .toEpochMilli();
+    Try.withResources(() -> new FileWriter(livenessFile))
+        .of(
+            writer -> {
+              writer.write(script);
+              return writer;
+            })
+        .onSuccess(writer -> log.info("Successfully updated liveness check script"))
+        .onFailure(ex -> log.error("Error updating liveness check script", ex));
+  }
 
-        final var script = LIVENESS_SCRIPT_TEMPLATE.formatted(maxTimestamp);
-        final var outputDir = new File(propStore.getOutputRootDirectory());
-
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            log.error(String.format("Unable to write liveness script file because Output Directory cannot be created: %s", propStore.getOutputRootDirectory()));
-            return;
-        }
-
-        final var livenessFile = new File(outputDir, LIVENESS_SCRIPT_FILE);
-
-        Try.withResources(() -> new FileWriter(livenessFile))
-                .of(writer -> {
-                    writer.write(script);
-                    return writer;
-                })
-                .onSuccess(writer -> log.info("Successfully updated liveness check script"))
-                .onFailure(ex -> log.error("Error updating liveness check script", ex));
-    }
-
-    protected ZonedDateTime nowUtc() {
-        return ZonedDateTime.now(ZoneId.of("UTC"));
-    }
-
+  protected ZonedDateTime nowUtc() {
+    return ZonedDateTime.now(ZoneId.of("UTC"));
+  }
 }

@@ -19,7 +19,7 @@
 package io.craigmiller160.db.backup.execution;
 
 public record CleanupResult(int successCount, int failureCount) {
-    public int totalCount() {
-        return successCount + failureCount;
-    }
+  public int totalCount() {
+    return successCount + failureCount;
+  }
 }

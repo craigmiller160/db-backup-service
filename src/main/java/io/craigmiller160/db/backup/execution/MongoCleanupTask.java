@@ -21,64 +21,90 @@ package io.craigmiller160.db.backup.execution;
 import io.craigmiller160.db.backup.properties.PropertyStore;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MongoCleanupTask  implements Runnable {
+public class MongoCleanupTask implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(MongoCleanupTask.class);
+  private static final Logger log = LoggerFactory.getLogger(MongoCleanupTask.class);
 
-    private final PropertyStore propStore;
-    private final String database;
+  private final PropertyStore propStore;
+  private final String database;
 
-    public MongoCleanupTask(final PropertyStore propStore,
-                            final String database) {
-        this.propStore = propStore;
-        this.database = database;
+  public MongoCleanupTask(final PropertyStore propStore, final String database) {
+    this.propStore = propStore;
+    this.database = database;
+  }
+
+  @Override
+  public void run() {
+    log.debug("Running cleanup for MongoDB Database {}", database);
+
+    final var targetDir =
+        Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database);
+    if (!Files.exists(targetDir)) {
+      log.info(
+          "Directory to cleanup MongoDB files does not exist: {}",
+          targetDir.toAbsolutePath().toString());
+      return;
     }
 
-    @Override
-    public void run() {
-        log.debug("Running cleanup for MongoDB Database {}", database);
+    final var oldestAllowed =
+        ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
+            .minusDays(propStore.getOutputCleanupAgeDays());
 
-        final var targetDir = Paths.get(propStore.getOutputRootDirectory(), BackupConstants.MONGO_DIR, database);
-        if (!Files.exists(targetDir)) {
-            log.info("Directory to cleanup MongoDB files does not exist: {}", targetDir.toAbsolutePath().toString());
-            return;
-        }
-
-        final var oldestAllowed = ZonedDateTime.now(ZoneId.of(BackupConstants.TIME_ZONE))
-                .minusDays(propStore.getOutputCleanupAgeDays());
-
-        Try.of(() ->
+    Try.of(
+            () ->
                 Stream.ofAll(Files.list(targetDir))
-                .filter(path -> {
-                    final var fileName = path.getFileName().toString();
-                    final var timestamp = LocalDateTime.parse(fileName, BackupConstants.FORMAT).atZone(ZoneId.of(BackupConstants.TIME_ZONE));
-                    return oldestAllowed.compareTo(timestamp) > 0;
-                })
-                .foldLeft(new CleanupResult(0, 0), (result, path) ->
-                        Try.of(() -> {
-                            FileUtils.deleteDirectory(path.toFile());
-                            return path;
+                    .filter(
+                        path -> {
+                          final var fileName = path.getFileName().toString();
+                          final var timestamp =
+                              LocalDateTime.parse(fileName, BackupConstants.FORMAT)
+                                  .atZone(ZoneId.of(BackupConstants.TIME_ZONE));
+                          return oldestAllowed.compareTo(timestamp) > 0;
                         })
-                                .map(p -> new CleanupResult(result.successCount() + 1, result.failureCount()))
-                                .recoverWith(ex -> {
-                                    log.debug(String.format("Failed to cleanup MongoDB directory %s for Database %s", path, database), ex);
-                                    return Try.success(new CleanupResult(result.successCount(), result.failureCount() + 1));
-                                })
-                                .get()
-                )
-        )
-                .onSuccess(result -> log.info("Finished cleaning up MongoDB Database {}. Success: {} Failure: {}", database, result.successCount(), result.failureCount()))
-                .onFailure(ex -> log.error(String.format("Error attempting to cleanup MongoDB Database %s", database), ex));
-    }
-
+                    .foldLeft(
+                        new CleanupResult(0, 0),
+                        (result, path) ->
+                            Try.of(
+                                    () -> {
+                                      FileUtils.deleteDirectory(path.toFile());
+                                      return path;
+                                    })
+                                .map(
+                                    p ->
+                                        new CleanupResult(
+                                            result.successCount() + 1, result.failureCount()))
+                                .recoverWith(
+                                    ex -> {
+                                      log.debug(
+                                          String.format(
+                                              "Failed to cleanup MongoDB directory %s for Database %s",
+                                              path, database),
+                                          ex);
+                                      return Try.success(
+                                          new CleanupResult(
+                                              result.successCount(), result.failureCount() + 1));
+                                    })
+                                .get()))
+        .onSuccess(
+            result ->
+                log.info(
+                    "Finished cleaning up MongoDB Database {}. Success: {} Failure: {}",
+                    database,
+                    result.successCount(),
+                    result.failureCount()))
+        .onFailure(
+            ex ->
+                log.error(
+                    String.format("Error attempting to cleanup MongoDB Database %s", database),
+                    ex));
+  }
 }

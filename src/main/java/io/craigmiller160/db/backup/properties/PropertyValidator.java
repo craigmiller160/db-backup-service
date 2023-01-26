@@ -22,8 +22,9 @@ import org.apache.commons.lang3.StringUtils;
 
 @FunctionalInterface
 public interface PropertyValidator {
-    PropertyValidator IS_NOT_BLANK = StringUtils::isNotBlank;
-    PropertyValidator IS_NUMERIC = (value) -> StringUtils.isNotBlank(value) && StringUtils.isNumeric(value);
+  PropertyValidator IS_NOT_BLANK = StringUtils::isNotBlank;
+  PropertyValidator IS_NUMERIC =
+      (value) -> StringUtils.isNotBlank(value) && StringUtils.isNumeric(value);
 
-    boolean validate(final String value);
+  boolean validate(final String value);
 }

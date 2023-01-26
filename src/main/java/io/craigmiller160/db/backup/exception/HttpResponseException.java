@@ -20,8 +20,7 @@ package io.craigmiller160.db.backup.exception;
 
 public class HttpResponseException extends Exception {
 
-    public HttpResponseException(final String message, final int status, final String body) {
-        super (String.format("%s: Status: %d, Body: %s", message, status, body));
-    }
-
+  public HttpResponseException(final String message, final int status, final String body) {
+    super(String.format("%s: Status: %d, Body: %s", message, status, body));
+  }
 }

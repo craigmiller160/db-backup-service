@@ -20,6 +20,4 @@ package io.craigmiller160.db.backup.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record MongoDatabaseConfig(
-        @JsonProperty("name") String name
-) { }
+public record MongoDatabaseConfig(@JsonProperty("name") String name) {}

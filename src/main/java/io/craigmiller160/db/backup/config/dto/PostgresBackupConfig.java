@@ -19,9 +19,7 @@
 package io.craigmiller160.db.backup.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public record PostgresBackupConfig(
-        @JsonProperty("databases") List<PostgresDatabaseConfig> databases
-) { }
+    @JsonProperty("databases") List<PostgresDatabaseConfig> databases) {}

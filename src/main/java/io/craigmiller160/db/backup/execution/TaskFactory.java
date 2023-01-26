@@ -23,24 +23,29 @@ import io.craigmiller160.db.backup.properties.PropertyStore;
 
 public class TaskFactory {
 
-    public Runnable createPostgresBackupTask(final PropertyStore propStore, final EmailService emailService, final String database, final String schema) {
-        return new PostgresBackupTask(propStore, database, schema, emailService);
-    }
+  public Runnable createPostgresBackupTask(
+      final PropertyStore propStore,
+      final EmailService emailService,
+      final String database,
+      final String schema) {
+    return new PostgresBackupTask(propStore, database, schema, emailService);
+  }
 
-    public Runnable createLivenessCheckTask(final PropertyStore propStore) {
-        return new LivenessCheckTask(propStore);
-    }
+  public Runnable createLivenessCheckTask(final PropertyStore propStore) {
+    return new LivenessCheckTask(propStore);
+  }
 
-    public Runnable createPostgresCleanupTask(final PropertyStore propStore, final String database, final String schema) {
-        return new PostgresCleanupTask(propStore, database, schema);
-    }
+  public Runnable createPostgresCleanupTask(
+      final PropertyStore propStore, final String database, final String schema) {
+    return new PostgresCleanupTask(propStore, database, schema);
+  }
 
-    public Runnable createMongoBackupTask(final PropertyStore propStore, final EmailService emailService, final String database) {
-        return new MongoBackupTask(propStore, database, emailService);
-    }
+  public Runnable createMongoBackupTask(
+      final PropertyStore propStore, final EmailService emailService, final String database) {
+    return new MongoBackupTask(propStore, database, emailService);
+  }
 
-    public Runnable createMongoCleanupTask(final PropertyStore propStore, final String database) {
-        return new MongoCleanupTask(propStore, database);
-    }
-
+  public Runnable createMongoCleanupTask(final PropertyStore propStore, final String database) {
+    return new MongoCleanupTask(propStore, database);
+  }
 }

@@ -20,9 +20,6 @@ package io.craigmiller160.db.backup.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.List;
-
 public record BackupConfig(
-        @JsonProperty("postgres") PostgresBackupConfig postgres,
-        @JsonProperty("mongodb") MongoBackupConfig mongodb
-) {}
+    @JsonProperty("postgres") PostgresBackupConfig postgres,
+    @JsonProperty("mongodb") MongoBackupConfig mongodb) {}

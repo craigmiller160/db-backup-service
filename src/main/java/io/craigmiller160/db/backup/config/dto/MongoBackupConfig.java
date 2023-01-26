@@ -19,9 +19,6 @@
 package io.craigmiller160.db.backup.config.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
-public record MongoBackupConfig (
-        @JsonProperty("databases") List<MongoDatabaseConfig> databases
-) { }
+public record MongoBackupConfig(@JsonProperty("databases") List<MongoDatabaseConfig> databases) {}

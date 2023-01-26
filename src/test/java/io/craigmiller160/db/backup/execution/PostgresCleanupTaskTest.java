@@ -18,12 +18,9 @@
 
 package io.craigmiller160.db.backup.execution;
 
-import io.craigmiller160.db.backup.properties.PropertyStore;
-import org.apache.commons.io.FileUtils;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import io.craigmiller160.db.backup.properties.PropertyStore;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -31,61 +28,62 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Properties;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class PostgresCleanupTaskTest {
 
-    private static final String DB_NAME = "DbName";
-    private static final String SCHEMA_NAME = "SchemaName";
-    private static final String OUTPUT_ROOT = String.format("%s/%s", System.getProperty("user.dir"), "target/output");
+  private static final String DB_NAME = "DbName";
+  private static final String SCHEMA_NAME = "SchemaName";
+  private static final String OUTPUT_ROOT =
+      String.format("%s/%s", System.getProperty("user.dir"), "target/output");
 
-    private PropertyStore propStore;
-    private PostgresCleanupTask postgresCleanupTask;
-    private Path outputPath;
-    private String file1;
-    private String file2;
-    private String file3;
+  private PropertyStore propStore;
+  private PostgresCleanupTask postgresCleanupTask;
+  private Path outputPath;
+  private String file1;
+  private String file2;
+  private String file3;
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
-        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+  @BeforeEach
+  public void beforeEach() throws Exception {
+    FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
 
-        final var props = new Properties();
-        props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
-        props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "10");
-        propStore = new PropertyStore(props);
+    final var props = new Properties();
+    props.setProperty(PropertyStore.OUTPUT_ROOT_DIR, OUTPUT_ROOT);
+    props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "10");
+    propStore = new PropertyStore(props);
 
-        outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.POSTGRES_DIR, DB_NAME, SCHEMA_NAME);
+    outputPath = Paths.get(OUTPUT_ROOT, BackupConstants.POSTGRES_DIR, DB_NAME, SCHEMA_NAME);
 
-        final var time1 = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
-        final var time2 = LocalDateTime.of(2020, 1, 2, 0, 0, 0);
-        final var time3 = LocalDateTime.now();
-        file1 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time1));
-        file2 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time2));
-        file3 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time3));
+    final var time1 = LocalDateTime.of(2020, 1, 1, 0, 0, 0);
+    final var time2 = LocalDateTime.of(2020, 1, 2, 0, 0, 0);
+    final var time3 = LocalDateTime.now();
+    file1 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time1));
+    file2 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time2));
+    file3 = String.format("backup_%s.sql", BackupConstants.FORMAT.format(time3));
 
-        postgresCleanupTask = new PostgresCleanupTask(propStore, DB_NAME, SCHEMA_NAME);
-    }
+    postgresCleanupTask = new PostgresCleanupTask(propStore, DB_NAME, SCHEMA_NAME);
+  }
 
-    @AfterEach
-    public void afterEach() throws Exception {
-        FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
-    }
+  @AfterEach
+  public void afterEach() throws Exception {
+    FileUtils.deleteDirectory(new File(OUTPUT_ROOT));
+  }
 
-    @Test
-    public void test_run() throws Exception {
-        Files.createDirectories(outputPath);
-        Files.createFile(Path.of(outputPath.toString(), file1));
-        Files.createFile(Path.of(outputPath.toString(), file2));
-        Files.createFile(Path.of(outputPath.toString(), file3));
+  @Test
+  public void test_run() throws Exception {
+    Files.createDirectories(outputPath);
+    Files.createFile(Path.of(outputPath.toString(), file1));
+    Files.createFile(Path.of(outputPath.toString(), file2));
+    Files.createFile(Path.of(outputPath.toString(), file3));
 
-        postgresCleanupTask.run();
+    postgresCleanupTask.run();
 
-        final var remainingFiles = Files.list(outputPath)
-                .collect(Collectors.toList());
-        assertEquals(1, remainingFiles.size());
-        assertEquals(file3, remainingFiles.get(0).getFileName().toString());
-    }
-
+    final var remainingFiles = Files.list(outputPath).collect(Collectors.toList());
+    assertEquals(1, remainingFiles.size());
+    assertEquals(file3, remainingFiles.get(0).getFileName().toString());
+  }
 }

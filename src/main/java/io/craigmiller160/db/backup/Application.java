@@ -31,54 +31,61 @@ import org.slf4j.LoggerFactory;
 
 public class Application {
 
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
-    private static final Object LOCK = new Object();
+  private static final Logger log = LoggerFactory.getLogger(Application.class);
+  private static final Object LOCK = new Object();
 
-    private final TaskFactory taskFactory = new TaskFactory();
-    private BackupScheduler backupScheduler;
+  private final TaskFactory taskFactory = new TaskFactory();
+  private BackupScheduler backupScheduler;
 
-    public void start() {
-        record StartContainer(
-                PropertyStore propStore,
-                ConfigReader configReader,
-                EmailService emailService,
-                BackupConfig backupConfig
-        ){}
+  public void start() {
+    record StartContainer(
+        PropertyStore propStore,
+        ConfigReader configReader,
+        EmailService emailService,
+        BackupConfig backupConfig) {}
 
-        log.info("Starting application");
-        new PropertyReader().readProperties()
-                .map(propStore -> {
-                    final var configReader = new ConfigReader(propStore);
-                    final var emailService = new EmailService(propStore);
-                    return new StartContainer(propStore, configReader, emailService, null);
-                })
-                .flatMap(startContainer ->
-                        startContainer.configReader().readBackupConfig()
-                                .map(config -> new StartContainer(
-                                        startContainer.propStore(), startContainer.configReader(),
-                                        startContainer.emailService(), config
-                                ))
-                )
-                .onSuccess(startContainer -> {
-                    log.info("Setting up scheduler");
-                    synchronized (LOCK) {
-                        backupScheduler = new BackupScheduler(
-                                startContainer.propStore(), startContainer.backupConfig(),
-                                taskFactory, startContainer.emailService()
-                        );
-                        backupScheduler.start();
-                    }
-                })
-                .onFailure(ex -> log.error("Error starting application", ex));
+    log.info("Starting application");
+    new PropertyReader()
+        .readProperties()
+        .map(
+            propStore -> {
+              final var configReader = new ConfigReader(propStore);
+              final var emailService = new EmailService(propStore);
+              return new StartContainer(propStore, configReader, emailService, null);
+            })
+        .flatMap(
+            startContainer ->
+                startContainer
+                    .configReader()
+                    .readBackupConfig()
+                    .map(
+                        config ->
+                            new StartContainer(
+                                startContainer.propStore(),
+                                startContainer.configReader(),
+                                startContainer.emailService(),
+                                config)))
+        .onSuccess(
+            startContainer -> {
+              log.info("Setting up scheduler");
+              synchronized (LOCK) {
+                backupScheduler =
+                    new BackupScheduler(
+                        startContainer.propStore(),
+                        startContainer.backupConfig(),
+                        taskFactory,
+                        startContainer.emailService());
+                backupScheduler.start();
+              }
+            })
+        .onFailure(ex -> log.error("Error starting application", ex));
+  }
+
+  // TODO how to trigger this when application is shutting down?
+  public void stop() {
+    log.info("Stopping scheduler");
+    synchronized (LOCK) {
+      Option.of(backupScheduler).forEach(BackupScheduler::stop);
     }
-
-    // TODO how to trigger this when application is shutting down?
-    public void stop() {
-        log.info("Stopping scheduler");
-        synchronized (LOCK) {
-            Option.of(backupScheduler)
-                    .forEach(BackupScheduler::stop);
-        }
-    }
-
+  }
 }

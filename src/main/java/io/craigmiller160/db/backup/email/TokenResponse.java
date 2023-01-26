@@ -18,10 +18,10 @@
 
 package io.craigmiller160.db.backup.email;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record TokenResponse(
-        @JsonProperty("accessToken") String accessToken,
-        @JsonProperty("refreshToken") String refreshToken,
-        @JsonProperty("tokenId") String tokenId
-) { }
+    @JsonProperty("access_token") String accessToken,
+    @JsonProperty("refresh_token") String refreshToken) {}

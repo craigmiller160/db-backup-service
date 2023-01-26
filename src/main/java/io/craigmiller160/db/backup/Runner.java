@@ -22,13 +22,13 @@ import io.craigmiller160.webutils.tls.TlsConfigurer;
 
 public class Runner {
 
-    private static final String TRUST_STORE_TYPE = "JKS";
-    private static final String TRUST_STORE_PATH = "truststore.jks";
-    private static final String TRUST_STORE_PASSWORD = "changeit";
+  private static final String TRUST_STORE_TYPE = "JKS";
+  private static final String TRUST_STORE_PATH = "truststore.jks";
+  private static final String TRUST_STORE_PASSWORD = "changeit";
 
-    public static void main(final String[] args) {
-        TlsConfigurer.INSTANCE.configureTlsTrustStore(TRUST_STORE_PATH, TRUST_STORE_TYPE, TRUST_STORE_PASSWORD);
-        new Application().start();
-    }
-
+  public static void main(final String[] args) {
+    TlsConfigurer.INSTANCE.configureTlsTrustStore(
+        TRUST_STORE_PATH, TRUST_STORE_TYPE, TRUST_STORE_PASSWORD);
+    new Application().start();
+  }
 }

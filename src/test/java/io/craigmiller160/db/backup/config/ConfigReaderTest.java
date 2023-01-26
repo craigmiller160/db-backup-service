@@ -18,56 +18,42 @@
 
 package io.craigmiller160.db.backup.config;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import io.craigmiller160.db.backup.config.dto.BackupConfig;
 import io.craigmiller160.db.backup.config.dto.MongoBackupConfig;
 import io.craigmiller160.db.backup.config.dto.MongoDatabaseConfig;
 import io.craigmiller160.db.backup.config.dto.PostgresBackupConfig;
 import io.craigmiller160.db.backup.config.dto.PostgresDatabaseConfig;
 import io.craigmiller160.db.backup.properties.PropertyStore;
+import java.util.List;
+import java.util.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-import java.util.Properties;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 public class ConfigReaderTest {
 
-    private PropertyStore propStore;
-    private ConfigReader configReader;
+  private PropertyStore propStore;
+  private ConfigReader configReader;
 
-    @BeforeEach
-    public void setup() {
-        final var properties = new Properties();
-        properties.setProperty("config.file", "backup_config.json");
-        propStore = new PropertyStore(properties);
-        configReader = new ConfigReader(propStore);
-    }
+  @BeforeEach
+  public void setup() {
+    final var properties = new Properties();
+    properties.setProperty("config.file", "backup_config.json");
+    propStore = new PropertyStore(properties);
+    configReader = new ConfigReader(propStore);
+  }
 
-    @Test
-    public void test_readBackupConfig() throws Exception {
-        final var expected = new BackupConfig(
-                new PostgresBackupConfig(
-                        List.of(
-                                new PostgresDatabaseConfig(
-                                        "vm_dev",
-                                        List.of("public")
-                                ),
-                                new PostgresDatabaseConfig(
-                                        "fake",
-                                        List.of("public")
-                                )
-                        )
-                ),
-                new MongoBackupConfig(
-                        List.of(
-                                new MongoDatabaseConfig("covid_19_prod")
-                        )
-                )
-        );
-        final var actual = configReader.readBackupConfig().get();
-        assertEquals(expected, actual);
-    }
-
+  @Test
+  public void test_readBackupConfig() throws Exception {
+    final var expected =
+        new BackupConfig(
+            new PostgresBackupConfig(
+                List.of(
+                    new PostgresDatabaseConfig("vm_dev", List.of("public")),
+                    new PostgresDatabaseConfig("fake", List.of("public")))),
+            new MongoBackupConfig(List.of(new MongoDatabaseConfig("covid_19_prod"))));
+    final var actual = configReader.readBackupConfig().get();
+    assertEquals(expected, actual);
+  }
 }
