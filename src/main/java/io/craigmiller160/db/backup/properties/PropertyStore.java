@@ -144,6 +144,10 @@ public class PropertyStore {
     return Integer.parseInt(props.getProperty(EMAIL_CONNECT_TIMEOUT_SECS));
   }
 
+  public String getAuthRealm() {
+    return props.getProperty(AUTH_REALM);
+  }
+
   public String getAuthHost() {
     return props.getProperty(AUTH_HOST);
   }

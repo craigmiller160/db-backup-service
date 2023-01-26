@@ -45,8 +45,6 @@ import org.slf4j.LoggerFactory;
 public class EmailService {
 
   private static final Logger log = LoggerFactory.getLogger(EmailService.class);
-
-  public static final String TOKEN_URI = "/oauth/token";
   public static final String EMAIL_URI = "/email";
   public static final DateTimeFormatter FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -102,6 +100,10 @@ public class EmailService {
             })
         .recoverWith(ex -> Try.failure(new RuntimeException("Error creating HttpClient", ex)))
         .get();
+  }
+
+  private String getTokenUri() {
+    return "/realms/%s/protocol/openid-connect/token".formatted(propStore.getAuthRealm());
   }
 
   private Try<String> sendErrorAlertEmail(final String dbSpecificErrorMessage, final Throwable ex) {
@@ -219,7 +221,7 @@ public class EmailService {
             final var formBody = "grant_type=client_credentials";
             final var httpRequest =
                 HttpRequest.newBuilder()
-                    .uri(URI.create(String.format("%s%s", propStore.getAuthHost(), TOKEN_URI)))
+                    .uri(URI.create(String.format("%s%s", propStore.getAuthHost(), getTokenUri())))
                     .POST(HttpRequest.BodyPublishers.ofString(formBody))
                     .header("Content-Type", "application/x-www-form-urlencoded")
                     .headers("Authorization", String.format("Basic %s", encodedBasicAuth))
