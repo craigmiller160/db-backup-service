@@ -19,6 +19,8 @@ app_deployment:
       itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
     - name: db-backup-service-mongodb
       itemPath: vaults/Home Server (Prod)/items/MongoDB Root Account
+    - name: db-backup-service-oauth2
+      itemPath: vaults/Home Server (Prod)/items/DB Backup Service OAuth2 Keys
   secrets:
     - envVariable: db.postgres.user
       secretName: db-backup-service-postgres
@@ -32,6 +34,12 @@ app_deployment:
     - envVariable: db.mongo.password
       secretName: db-backup-service-mongodb
       secretKey: password
+    - envVariable: auth.client-id
+      secretName: db-backup-service-oauth2
+      secretKey: kcClientId
+    - envVariable: auth.client-id
+      secretName: db-backup-service-oauth2
+      secretKey: kcClientSecret
   commonProbe:
     exec:
       command:
