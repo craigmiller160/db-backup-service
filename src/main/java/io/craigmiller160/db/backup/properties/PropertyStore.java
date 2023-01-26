@@ -47,6 +47,7 @@ public class PropertyStore {
   public static final String AUTH_HOST = "auth.host";
   public static final String AUTH_CLIENT_ID = "auth.client-id";
   public static final String AUTH_CLIENT_SECRET = "auth.client-secret";
+  public static final String AUTH_REALM = "auth.realm";
   public static final String OUTPUT_CLEANUP_AGE_DAYS = "output.cleanup.age-days";
   public static final String MONGODUMP_COMMAND = "mongodump.command";
 
@@ -71,6 +72,7 @@ public class PropertyStore {
           Tuple.of(AUTH_HOST, PropertyValidator.IS_NOT_BLANK),
           Tuple.of(AUTH_CLIENT_ID, PropertyValidator.IS_NOT_BLANK),
           Tuple.of(AUTH_CLIENT_SECRET, PropertyValidator.IS_NOT_BLANK),
+          Tuple.of(AUTH_REALM, PropertyValidator.IS_NOT_BLANK),
           Tuple.of(OUTPUT_CLEANUP_AGE_DAYS, PropertyValidator.IS_NUMERIC),
           Tuple.of(MONGODUMP_COMMAND, PropertyValidator.IS_NOT_BLANK));
 

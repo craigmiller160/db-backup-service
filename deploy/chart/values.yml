@@ -9,11 +9,12 @@ app_deployment:
     output.cleanup.age-days: "10"
     executor.interval-secs: "86400"
     email.host: https://email-service:8443
-    email.auth.host: https://sso-oauth2-server:8443
     mongodump.command: /mongotools/mongodump
     db.mongo.host: mongodb.infra-prod
     db.mongo.port: "27017"
     logger.application.level: info
+    auth.host: https://auth-craigmiller160.ddns.net
+    auth.realm: apps-prod
   onepassworditems:
     - name: db-backup-service-postgres
       itemPath: vaults/Home Server (Prod)/items/Postgres Root Account
