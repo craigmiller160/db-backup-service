@@ -6,7 +6,7 @@ An application to run and automatically backup data from databases in the Kubern
 
 This application will run on a set interval and execute database backups.
 
-## Terraform Environment Variables
+## Terraform Setup
 
 For the Terraform script to run, the following environment variables must be present on the machine.
 
@@ -14,6 +14,8 @@ For the Terraform script to run, the following environment variables must be pre
 # The operator access token for communicating with 1Password
 ONEPASSWORD_TOKEN=XXXXXXX
 ```
+
+Also, if this is being deployed without the `email-service` app available, set the `email_service_available` property in the `terraform.json` to 0.
 
 ## Setting Up Development Environment
 

@@ -1,3 +1,4 @@
 {
-  "onepassword_token": "$ONEPASSWORD_TOKEN"
+  "onepassword_token": "$ONEPASSWORD_TOKEN",
+  "email_service_available": 0
 }
