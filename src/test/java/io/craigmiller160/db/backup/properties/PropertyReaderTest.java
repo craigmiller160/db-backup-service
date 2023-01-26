@@ -37,13 +37,13 @@ public class PropertyReaderTest {
 
   @Test
   @SetEnvironmentVariable(key = "db.postgres.host", value = "TestHost")
-  @SetEnvironmentVariable(key = "db.postgres.password", value = "password")
-  @SetEnvironmentVariable(key = "db.mongo.password", value = "password")
+  @SetEnvironmentVariable(key = "db.postgres.password", value = "password22")
+  @SetEnvironmentVariable(key = "db.mongo.password", value = "password22")
   public void test_readProperties() throws Exception {
     final var propStore = propertyReader.readProperties().get();
     assertEquals("TestHost", propStore.getPostgresHost());
-    assertEquals("30001", propStore.getPostgresPort());
-    assertEquals("postgres_root", propStore.getPostgresUser());
-    assertEquals("password", propStore.getPostgresPassword());
+    assertEquals("5432", propStore.getPostgresPort());
+    assertEquals("postgres", propStore.getPostgresUser());
+    assertEquals("password22", propStore.getPostgresPassword());
   }
 }

@@ -52,6 +52,7 @@ public class PropertyStoreTest {
     props.setProperty(PropertyStore.AUTH_HOST, "https://localhost:7003");
     props.setProperty(PropertyStore.AUTH_CLIENT_ID, "ABC");
     props.setProperty(PropertyStore.AUTH_CLIENT_SECRET, "DEF");
+    props.setProperty(PropertyStore.AUTH_REALM, "apps-dev");
     props.setProperty(PropertyStore.OUTPUT_CLEANUP_AGE_DAYS, "30");
     props.setProperty(PropertyStore.MONGODUMP_COMMAND, "mongodump");
   }
