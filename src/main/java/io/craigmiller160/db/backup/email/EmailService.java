@@ -102,7 +102,7 @@ public class EmailService {
         .get();
   }
 
-  private String getTokenUri() {
+  String getTokenUri() {
     return "/realms/%s/protocol/openid-connect/token".formatted(propStore.getAuthRealm());
   }
 

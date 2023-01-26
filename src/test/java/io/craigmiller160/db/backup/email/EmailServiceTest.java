@@ -60,6 +60,7 @@ public class EmailServiceTest {
   private static final String AUTH_HOST = "https://localhost:7003";
   private static final String AUTH_EMAIL_CLIENT_KEY = "ABC";
   private static final String AUTH_EMAIL_CLIENT_SECRET = "DEF";
+  private static final String AUTH_REALM = "apps-dev";
   private static final String ACCESS_TOKEN = "accessToken";
   private static final String USER = "user";
   private static final String PASSWORD = "password";
@@ -83,6 +84,7 @@ public class EmailServiceTest {
     properties.setProperty(PropertyStore.AUTH_HOST, AUTH_HOST);
     properties.setProperty(PropertyStore.AUTH_CLIENT_ID, AUTH_EMAIL_CLIENT_KEY);
     properties.setProperty(PropertyStore.AUTH_CLIENT_SECRET, AUTH_EMAIL_CLIENT_SECRET);
+    properties.setProperty(PropertyStore.AUTH_REALM, AUTH_REALM);
     propStore = new PropertyStore(properties);
     emailService = new TestEmailService(propStore, () -> httpClient);
   }
@@ -121,7 +123,7 @@ public class EmailServiceTest {
     assertEquals(2, requestCaptor.getAllValues().size());
     testHttpRequest(
         requestCaptor.getAllValues().get(0),
-        URI.create(String.format("%s%s", AUTH_HOST, EmailService.TOKEN_URI)),
+        URI.create(String.format("%s%s", AUTH_HOST, emailService.getTokenUri())),
         tokenRequest);
     testHttpRequest(
         requestCaptor.getAllValues().get(1),
@@ -163,7 +165,7 @@ public class EmailServiceTest {
     assertEquals(2, requestCaptor.getAllValues().size());
     testHttpRequest(
         requestCaptor.getAllValues().get(0),
-        URI.create(String.format("%s%s", AUTH_HOST, EmailService.TOKEN_URI)),
+        URI.create(String.format("%s%s", AUTH_HOST, emailService.getTokenUri())),
         tokenRequest);
     testHttpRequest(
         requestCaptor.getAllValues().get(1),
