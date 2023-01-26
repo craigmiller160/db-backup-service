@@ -15,7 +15,7 @@ For the Terraform script to run, the following environment variables must be pre
 ONEPASSWORD_TOKEN=XXXXXXX
 ```
 
-Also, if this is being deployed without the `email-service` app available, set the `email_service_available` property in the `terraform.json` to 0.
+Also, if this is being deployed without the `email-service` app available, set the `email_service_available` property in the `terraform.json` to 0. To re-enable it, set this property back to 1.
 
 ## Setting Up Development Environment
 
