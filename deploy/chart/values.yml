@@ -49,5 +49,5 @@ app_deployment:
   volumes:
     - name: db-backup-service-volume
       type: HostPath
-      hostPath: /home/craig/OtherDrive/DbBackup
+      hostPath: /home/craig/MediaDrive/DbBackup
       deploymentMountPath: /output
