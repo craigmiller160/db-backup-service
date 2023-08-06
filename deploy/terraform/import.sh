@@ -4,12 +4,14 @@ function import {
   terraform \
     import \
     -var="onepassword_token=$ONEPASSWORD_TOKEN"\
+    -var="email_service_available=1"
     "$1" "$2"
 }
 
 function plan {
   terraform plan \
-    -var "onepassword_token=$ONEPASSWORD_TOKEN"
+    -var "onepassword_token=$ONEPASSWORD_TOKEN" \
+    -var="email_service_available=1"
 }
 
 import "keycloak_openid_client.db_backup_service_dev" "apps-dev/a2d1def0-5c76-4e30-beb4-75958ad706f0"
