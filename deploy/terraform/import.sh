@@ -4,7 +4,7 @@ function import {
   terraform \
     import \
     -var="onepassword_token=$ONEPASSWORD_TOKEN"\
-    -var="email_service_available=1"
+    -var="email_service_available=1" \
     "$1" "$2"
 }
 
