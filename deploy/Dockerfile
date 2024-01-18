@@ -1,9 +1,12 @@
 FROM openjdk:21-slim
 
-RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt update
-RUN apt install postgresql-client-14 -y
+RUN apt update \
+    && apt install wget
+
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && apt update \
+    && apt install postgresql-client-14 -y
 
 RUN mkdir /mongotools
 COPY mongotools/* /mongotools
