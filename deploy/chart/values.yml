@@ -38,7 +38,7 @@ app_deployment:
     - envVariable: auth.client-id
       secretName: db-backup-service-oauth2
       secretKey: kcClientId
-    - envVariable: auth.client-id
+    - envVariable: auth.client-secret
       secretName: db-backup-service-oauth2
       secretKey: kcClientSecret
   commonProbe:
