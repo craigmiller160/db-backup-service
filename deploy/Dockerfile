@@ -1,7 +1,7 @@
 FROM openjdk:21-slim
 
 RUN apt update \
-    && apt install wget
+    && apt install wget -y
 
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
     && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
