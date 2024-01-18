@@ -1,4 +1,4 @@
-FROM openjdk:18.0.2.1-jdk-buster
+FROM openjdk:21-slim
 
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt buster-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -

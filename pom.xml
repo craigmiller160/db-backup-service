@@ -6,7 +6,7 @@
 
     <groupId>io.craigmiller160</groupId>
     <artifactId>db-backup-service</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
 
     <distributionManagement>
         <repository>
@@ -23,7 +23,7 @@
 
     <properties>
         <web.utils.version>1.1.4</web.utils.version>
-        <java.version>18</java.version>
+        <java.version>21</java.version>
         <jackson.version>2.11.3</jackson.version>
         <junit.version>5.7.0</junit.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -35,7 +35,7 @@
         <commons.lang.verison>3.11</commons.lang.verison>
         <hamcrest.version>2.2</hamcrest.version>
         <org.json.version>20201115</org.json.version>
-        <spotless.version>2.26.0</spotless.version>
+        <spotless.version>2.42.0</spotless.version>
         <maven.git.hooks.version>1.0.1</maven.git.hooks.version>
         <git.hooks.plugin.version>3.3.0</git.hooks.plugin.version>
     </properties>
@@ -152,7 +152,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.2.5</version>
                 <configuration>
                     <argLine>--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED</argLine>
                 </configuration>
